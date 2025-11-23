@@ -1,5 +1,7 @@
 #include "internal/sgl_window.h"
 #include "internal/sgl_util.h"
+#include "internal/sgl_info.h"
+#include "internal/sgl_backend.h"
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -7,8 +9,6 @@
 #include "internal/sgl_log.h"
 
 namespace sgl {
-    bool window::s_glfw_initialized = false;
-    bool window::s_glad_initialized = false;
     int window::s_window_count = 0;
 
     // ctors
@@ -40,7 +40,7 @@ namespace sgl {
             return unexpected(window_error::INVALID_PARAMS);
         }
 
-        if (!init_glfw()) {
+        if (!backend::ensure_glfw()) {
             return unexpected(window_error::GLFW_INIT_FAILED);
         }
 
@@ -58,7 +58,7 @@ namespace sgl {
 
         glfwMakeContextCurrent(handle);
 
-        if (!init_glad()) {
+        if (!backend::ensure_glad()) {
             glfwDestroyWindow(handle);
             return unexpected(window_error::GLAD_LOAD_FAILED);
         }
@@ -71,6 +71,8 @@ namespace sgl {
 
         glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
         glfwSetKeyCallback(handle, key_callback);
+
+        info::print_info();
 
         return window{handle};
     }
@@ -145,32 +147,6 @@ namespace sgl {
         }
     }
 
-    bool window::init_glfw() noexcept {
-        if (s_glfw_initialized) {
-            return true;
-        }
-
-        if (!glfwInit()) {
-            return false;
-        }
-
-        s_glfw_initialized = true;
-        return true;
-    }
-
-    bool window::init_glad() noexcept {
-        if (s_glad_initialized) {
-            return true;
-        }
-
-        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-            return false;
-        }
-
-        s_glad_initialized = true;
-        return true;
-    }
-
     void window::destroy_window() noexcept {
         if (!m_window) {
             return;
@@ -180,10 +156,9 @@ namespace sgl {
         m_window = nullptr;
 
         --s_window_count;
-        if (s_window_count == 0 && s_glfw_initialized) {
+        if (s_window_count == 0) {
             glfwTerminate();
-            s_glfw_initialized = false;
-            s_glad_initialized = false;
+            backend::reset();
         }
     }
 }

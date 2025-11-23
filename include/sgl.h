@@ -9,3 +9,5 @@
 #include "internal/sgl_type.h"
 #include "internal/sgl_color.h"
 #include "internal/sgl_vertex_buffer.h"
+#include "internal/sgl_info.h"
+#include "internal/sgl_math.h"

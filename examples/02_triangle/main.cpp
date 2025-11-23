@@ -1,5 +1,7 @@
 #include "sgl.h"
 
+#include <array>
+
 static constexpr int SCREEN_WIDTH = 1920;
 static constexpr int SCREEN_HEIGHT = 1080;
 static constexpr auto SCREEN_TITLE = __FILE__;
@@ -30,10 +32,21 @@ static auto FRAGMENT_SHADER_SOURCE = R"(
     }
 )";
 
+struct vertex {
+    sgl::gl_float pos[3];
+    sgl::gl_float color[3];
+};
+
 int main() {
     auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
     auto shader = sgl::shader::create_from_source_or_panic(VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+
+    const std::array<vertex, 3> vertices = {{
+        {.pos = {-0.5f, -0.5f, 0.f}, .color = {1.f, 0.f, 0.f}},
+        {.pos = { 0.5f, -0.5f, 0.f}, .color = {0.f, 1.f, 0.f}},
+        {.pos = { 0.0f,  0.5f, 0.f}, .color = {0.f, 0.f, 1.f}},
+    }};
 
     sgl::render::set_clear_color(sgl::colors::WHITE);
 

@@ -74,11 +74,6 @@ namespace sgl {
         static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-        static bool init_glfw() noexcept;
-        static bool init_glad() noexcept;
-
-        static bool s_glfw_initialized;
-        static bool s_glad_initialized;
         static int s_window_count;
 
     private:
