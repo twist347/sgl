@@ -27,6 +27,7 @@ add_library(
         src/sgl_log.cpp
         src/sgl_shader.cpp
         src/sgl_type.cpp
+        src/sgl_vertex_buffer.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)

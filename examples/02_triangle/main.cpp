@@ -31,17 +31,17 @@ static auto FRAGMENT_SHADER_SOURCE = R"(
 )";
 
 int main() {
-    auto window = sgl::window_t::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
-    auto shader = sgl::shader_t::create_from_source_or_panic(VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+    auto shader = sgl::shader::create_from_source_or_panic(VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
 
-    sgl::render_t::set_clear_color(sgl::color::WHITE);
+    sgl::render::set_clear_color(sgl::colors::WHITE);
 
     while (!window.should_close()) {
-        sgl::render_t::clear_color_buffer();
+        sgl::render::clear_color_buffer();
 
         window.swap_buffers();
-        sgl::window_t::poll_events();
+        sgl::window::poll_events();
     }
 
     return EXIT_SUCCESS;

@@ -2,13 +2,13 @@
 
 #include <string>
 
-#include "sgl_expected_facade.h"
+#include "sgl_expected.h"
 
 // forward decl
 struct GLFWwindow;
 
 namespace sgl {
-    enum class window_error_e {
+    enum class window_error {
         INVALID_PARAMS = 0,
         GLFW_INIT_FAILED,
         GLFW_CREATE_WINDOW_FAILED,
@@ -16,36 +16,36 @@ namespace sgl {
         COUNT
     };
 
-    class window_t {
+    class window {
     public:
-        using error_t = window_error_e;
-        using expected_t = expected<window_t, error_t>;
+        using error = window_error;
+        using result = expected<window, error>;
 
         // ctors
 
-        window_t(const window_t &) = delete;
+        window(const window &) = delete;
 
-        window_t &operator=(const window_t &) = delete;
+        window &operator=(const window &) = delete;
 
-        window_t(window_t &&other) noexcept;
+        window(window &&other) noexcept;
 
-        window_t &operator=(window_t &&other) noexcept;
+        window &operator=(window &&other) noexcept;
 
-        ~window_t();
+        ~window();
 
         // fabrics
 
-        static expected_t create(int width, int height, const char *title) noexcept;
+        static result create(int width, int height, const char *title) noexcept;
 
-        static expected_t create(int width, int height, const std::string &title) noexcept {
+        static result create(int width, int height, const std::string &title) noexcept {
             return create(width, height, title.c_str());
         }
 
         // or panic wrappers
 
-        static window_t create_or_panic(int width, int height, const char *title) noexcept;
+        static window create_or_panic(int width, int height, const char *title) noexcept;
 
-        static window_t create_or_panic(int width, int height, const std::string &title) noexcept {
+        static window create_or_panic(int width, int height, const std::string &title) noexcept {
             return create_or_panic(width, height, title.c_str());
         }
 
@@ -65,20 +65,25 @@ namespace sgl {
 
         static void poll_events();
 
-        static const char *err_to_str(window_error_e err) noexcept;
+        static const char *err_to_str(window_error err) noexcept;
 
     private:
-        explicit window_t(GLFWwindow *handle) noexcept : m_window(handle) {
+        explicit window(GLFWwindow *handle) noexcept : m_window(handle) {
         }
 
         static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+        static bool init_glfw() noexcept;
+        static bool init_glad() noexcept;
 
         static bool s_glfw_initialized;
         static bool s_glad_initialized;
         static int s_window_count;
 
     private:
+        void destroy_window() noexcept;
+
         GLFWwindow *m_window = nullptr;
     };
 }
