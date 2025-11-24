@@ -37,10 +37,10 @@ namespace sgl {
 
     class shader {
     public:
-        // ctors
-
         using error = shader_error;
         using result = expected<shader, error>;
+
+        // ctors and assignments
 
         shader(const shader &) = delete;
 

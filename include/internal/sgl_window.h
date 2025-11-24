@@ -21,7 +21,7 @@ namespace sgl {
         using error = window_error;
         using result = expected<window, error>;
 
-        // ctors
+        // ctors and assignments
 
         window(const window &) = delete;
 
@@ -65,7 +65,7 @@ namespace sgl {
 
         static void poll_events();
 
-        static const char *err_to_str(window_error err) noexcept;
+        static const char *err_to_str(error err) noexcept;
 
     private:
         explicit window(GLFWwindow *handle) noexcept : m_window(handle) {

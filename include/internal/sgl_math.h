@@ -109,10 +109,9 @@ namespace sgl {
         return dot(v, v);
     }
 
-    template<typename T, std::size_t N>
-    auto length(const vec<T, N> &v) noexcept {
-        using std::sqrt;
-        return sqrt(static_cast<double>(length_squared(v)));
+    template<typename T, std::size_t N, typename R = double>
+    auto length(const vec<T, N> &v) noexcept -> R {
+        return std::sqrt(static_cast<R>(length_squared(v)));
     }
 
     template<typename T, std::size_t N>

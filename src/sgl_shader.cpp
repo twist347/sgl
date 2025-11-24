@@ -5,6 +5,7 @@
 #include <string>
 
 #include "glad/glad.h"
+
 #include "internal/sgl_log.h"
 
 namespace sgl {
