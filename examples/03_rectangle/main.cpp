@@ -8,31 +8,8 @@ static constexpr int SCREEN_WIDTH = 1920;
 static constexpr int SCREEN_HEIGHT = 1080;
 static constexpr auto SCREEN_TITLE = __FILE__;
 
-static auto VERTEX_SHADER_SOURCE = R"(
-    #version 330 core
-
-    layout (location = 0) in vec3 a_pos;
-    layout (location = 1) in vec4 a_color;
-
-    out vec4 color;
-
-    void main() {
-        gl_Position = vec4(a_pos, 1.0);
-        color = a_color;
-    }
-)";
-
-static auto FRAGMENT_SHADER_SOURCE = R"(
-    #version 330 core
-
-    out vec4 frag_color;
-
-    in vec4 color;
-
-    void main() {
-        frag_color = color;
-    }
-)";
+static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
+static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
 
 struct vertex {
     sgl::gl_float pos[3];
@@ -95,7 +72,7 @@ int main() {
 
     vao.set_element_buffer(ebo);
 
-    const auto shader = sgl::shader::create_from_source_or_panic(VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+    const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
     sgl::render::set_clear_color(sgl::colors::WHITE);
 

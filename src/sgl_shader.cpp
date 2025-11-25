@@ -39,7 +39,7 @@ namespace sgl {
 
     // fabrics
 
-    shader::result shader::create_from_shaders(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
+    shader::result shader::create_from_ids(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
         if (!vertex_shader || !fragment_shader) {
             return unexpected{error::INVALID_PARAMS};
         }
@@ -79,7 +79,7 @@ namespace sgl {
             return unexpected{err};
         }
 
-        auto prog_res = create_from_shaders(vs, fs);
+        auto prog_res = create_from_ids(vs, fs);
 
         glDeleteShader(vs);
         glDeleteShader(fs);
@@ -110,8 +110,8 @@ namespace sgl {
 
     // or panic wrappers
 
-    shader shader::create_from_shaders_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
-        auto res = create_from_shaders(vertex_shader, fragment_shader);
+    shader shader::create_from_ids_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
+        auto res = create_from_ids(vertex_shader, fragment_shader);
         if (!res) {
             const auto err = res.error();
             SGL_LOG_FATAL("failed to create shader program from shaders: %s", shader::err_to_str(err));

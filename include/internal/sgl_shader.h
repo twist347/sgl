@@ -54,7 +54,7 @@ namespace sgl {
 
         // fabrics
 
-        static result create_from_shaders(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
+        static result create_from_ids(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
 
         static result create_from_source(const char *vertex_src, const char *fragment_src) noexcept;
 
@@ -70,7 +70,7 @@ namespace sgl {
 
         // or panic wrappers
 
-        static shader create_from_shaders_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
+        static shader create_from_ids_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
 
         static shader create_from_source_or_panic(const char *vertex_src, const char *fragment_src) noexcept;
 
