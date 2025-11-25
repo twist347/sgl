@@ -1,8 +1,8 @@
 #include "internal/sgl_type.h"
 
-#include "glad/glad.h"
-
 #include <type_traits>
+
+#include "glad/glad.h"
 
 namespace {
     static_assert(std::is_same_v<sgl::gl_boolean, GLboolean>);

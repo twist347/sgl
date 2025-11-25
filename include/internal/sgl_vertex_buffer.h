@@ -6,7 +6,7 @@
 namespace sgl {
     enum class vertex_buffer_error {
         INVALID_PARAMS = 0,
-        GL_GEN_FAILED,
+        GL_GEN_BUFFERS_FAILED,
         GL_ALLOC_FAILED,
         COUNT
     };

@@ -1,11 +1,17 @@
 #include "internal/sgl_info.h"
-#include "internal/sgl_type.h"
-#include "internal/sgl_log.h"
 
 #include "glad/glad.h"
 
+#include "internal/sgl_type.h"
+#include "internal/sgl_log.h"
+#include "internal/sgl_util.h"
+#include "internal/sgl_backend.h"
+
 namespace sgl::info {
     void print_info() noexcept {
+        SGL_ASSERT(detail::backend::ensure_glfw());
+        SGL_ASSERT(detail::backend::ensure_glad());
+
         gl_int major = 0, minor = 0, profile = 0, n_ext = 0;
         auto vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         auto renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));

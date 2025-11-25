@@ -1,9 +1,9 @@
 #include "internal/sgl_backend.h"
 
 #include "glad/glad.h"
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
-namespace sgl::backend {
+namespace sgl::detail::backend {
     static bool s_glfw_initialized = false;
     static bool s_glad_initialized = false;
 

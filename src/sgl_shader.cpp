@@ -41,7 +41,7 @@ namespace sgl {
 
     shader::result shader::create_from_shaders(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
         if (!vertex_shader || !fragment_shader) {
-            return unexpected(error::INVALID_PARAMS);
+            return unexpected{error::INVALID_PARAMS};
         }
 
         const gl_uint program = glCreateProgram();
@@ -55,7 +55,7 @@ namespace sgl {
 
         if (!check_link(program)) {
             glDeleteProgram(program);
-            return unexpected(error::PROGRAM_LINK_FAILED);
+            return unexpected{error::PROGRAM_LINK_FAILED};
         }
 
         return shader{program};
@@ -63,20 +63,20 @@ namespace sgl {
 
     shader::result shader::create_from_source(const char *vertex_src, const char *fragment_src) noexcept {
         if (!vertex_src || !fragment_src) {
-            return unexpected(error::INVALID_PARAMS);
+            return unexpected{error::INVALID_PARAMS};
         }
 
         auto err = error::INVALID_PARAMS;
 
         const gl_uint vs = compile_shader(GL_VERTEX_SHADER, vertex_src, err);
         if (vs == 0) {
-            return unexpected(err);
+            return unexpected{err};
         }
 
         const gl_uint fs = compile_shader(GL_FRAGMENT_SHADER, fragment_src, err);
         if (fs == 0) {
             glDeleteShader(vs);
-            return unexpected(err);
+            return unexpected{err};
         }
 
         auto prog_res = create_from_shaders(vs, fs);
@@ -89,7 +89,7 @@ namespace sgl {
 
     shader::result shader::create_from_files(const char *vertex_path, const char *fragment_path) noexcept {
         if (!vertex_path || !fragment_path) {
-            return unexpected(error::INVALID_PARAMS);
+            return unexpected{error::INVALID_PARAMS};
         }
 
         std::string vs_src;
@@ -97,12 +97,12 @@ namespace sgl {
 
         if (!read_text_file(vertex_path, vs_src)) {
             SGL_LOG_ERROR("failed to read vertex shader file: %s", vertex_path);
-            return unexpected(error::FILE_IO_FAILED);
+            return unexpected{error::FILE_IO_FAILED};
         }
 
         if (!read_text_file(fragment_path, fs_src)) {
             SGL_LOG_ERROR("failed to read fragment shader file: %s", fragment_path);
-            return unexpected(error::FILE_IO_FAILED);
+            return unexpected{error::FILE_IO_FAILED};
         }
 
         return create_from_source(vs_src, fs_src);

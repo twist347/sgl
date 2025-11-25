@@ -1,10 +1,15 @@
 #pragma once
 
+#include <cstddef>
+#include <cassert>
+
 #include "sgl_log.h"
 
 #define SGL_UNUSED(val)    ((void) (val))
 
 #define SGL_ARR_LEN(arr)    (sizeof((arr)) / sizeof((arr)[0]))
+
+#define SGL_ASSERT(cond)    (assert(cond))
 
 #define SGL_VERIFY_MSG(cond, msg)                                              \
     do {                                                                       \
@@ -33,3 +38,5 @@
             __func__, __FILE__, __LINE__                                       \
         );                                                                     \
     } while (0)
+
+#define SGL_OFFSET_OF(type, member)    (reinterpret_cast<void *>(offsetof(type, member)))

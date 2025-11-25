@@ -1,20 +1,21 @@
 #include "internal/sgl_window.h"
-#include "internal/sgl_util.h"
-#include "internal/sgl_info.h"
-#include "internal/sgl_backend.h"
+
+#include <utility>
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 #include "internal/sgl_log.h"
+#include "internal/sgl_util.h"
+#include "internal/sgl_info.h"
+#include "internal/sgl_backend.h"
 
 namespace sgl {
     int window::s_window_count = 0;
 
     // ctors
 
-    window::window(window &&other) noexcept : m_window(other.m_window) {
-        other.m_window = nullptr;
+    window::window(window &&other) noexcept : m_window(std::exchange(other.m_window, nullptr)) {
     }
 
     window &window::operator=(window &&other) noexcept {
@@ -24,8 +25,8 @@ namespace sgl {
 
         destroy_window();
 
-        m_window = other.m_window;
-        other.m_window = nullptr;
+        m_window = std::exchange(other.m_window, nullptr);
+
         return *this;
     }
 
@@ -37,11 +38,11 @@ namespace sgl {
 
     window::result window::create(int width, int height, const char *title) noexcept {
         if (width <= 0 || height <= 0 || !title) {
-            return unexpected(window_error::INVALID_PARAMS);
+            return unexpected{error::INVALID_PARAMS};
         }
 
-        if (!backend::ensure_glfw()) {
-            return unexpected(window_error::GLFW_INIT_FAILED);
+        if (!detail::backend::ensure_glfw()) {
+            return unexpected{error::GLFW_INIT_FAILED};
         }
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -53,14 +54,14 @@ namespace sgl {
 
         GLFWwindow *handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
         if (!handle) {
-            return unexpected(window_error::GLFW_CREATE_WINDOW_FAILED);
+            return unexpected{error::GLFW_CREATE_WINDOW_FAILED};
         }
 
         glfwMakeContextCurrent(handle);
 
-        if (!backend::ensure_glad()) {
+        if (!detail::backend::ensure_glad()) {
             glfwDestroyWindow(handle);
-            return unexpected(window_error::GLAD_LOAD_FAILED);
+            return unexpected{error::GLAD_LOAD_FAILED};
         }
 
         ++s_window_count;
@@ -158,7 +159,7 @@ namespace sgl {
         --s_window_count;
         if (s_window_count == 0) {
             glfwTerminate();
-            backend::reset();
+            detail::backend::reset();
         }
     }
 }

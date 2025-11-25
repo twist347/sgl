@@ -36,17 +36,17 @@ namespace sgl {
 
     vertex_buffer::result vertex_buffer::create(const void *data, gl_sizeiptr size, gl_enum usage) noexcept {
         if (size <= 0) {
-            return unexpected(error::INVALID_PARAMS);
+            return unexpected{error::INVALID_PARAMS};
         }
 
         gl_uint id = 0;
         glGenBuffers(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenBuffers() returned 0");
-            return unexpected(error::GL_GEN_FAILED);
+            return unexpected{error::GL_GEN_BUFFERS_FAILED};
         }
 
-        GLint prev = 0;
+        gl_int prev = 0;
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prev);
 
         glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -59,7 +59,7 @@ namespace sgl {
         if (!ok) {
             SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
             glDeleteBuffers(1, &id);
-            return unexpected(error::GL_ALLOC_FAILED);
+            return unexpected{error::GL_ALLOC_FAILED};
         }
 
         return vertex_buffer{id, size, usage};
@@ -110,7 +110,7 @@ namespace sgl {
     const char *vertex_buffer::err_to_str(error e) noexcept {
         switch (e) {
             case error::INVALID_PARAMS: return "invalid params";
-            case error::GL_GEN_FAILED: return "glGenBuffers() failed";
+            case error::GL_GEN_BUFFERS_FAILED: return "glGenBuffers() failed";
             case error::GL_ALLOC_FAILED: return "glBufferData() failed to allocate";
             default: return "unknown vertex_buffer_error";
         }
