@@ -28,6 +28,7 @@ add_library(
         src/sgl_shader.cpp
         src/sgl_type.cpp
         src/sgl_vertex_buffer.cpp
+        src/sgl_element_buffer.cpp
         src/sgl_vertex_array.cpp
         src/sgl_info.cpp
         src/sgl_backend.cpp

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "sgl_expected.h"
-#include "internal/sgl_type.h"
+#include "sgl_type.h"
 
 namespace sgl {
     class vertex_buffer;
+    class element_buffer;
 
     enum class vertex_array_error {
         GL_GEN_FAILED = 0,
@@ -74,6 +75,8 @@ namespace sgl {
             gl_sizei stride,
             const void *pointer
         ) const noexcept;
+
+        void set_element_buffer(const element_buffer &ebo) noexcept;
 
         static const char *err_to_string(error e) noexcept;
 

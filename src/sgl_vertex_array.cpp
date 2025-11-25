@@ -5,6 +5,7 @@
 #include "glad/glad.h"
 
 #include "internal/sgl_vertex_buffer.h"
+#include "internal/sgl_element_buffer.h"
 #include "internal/sgl_log.h"
 #include "internal/sgl_util.h"
 #include "internal/sgl_type.h"
@@ -113,6 +114,12 @@ namespace sgl {
 
         glVertexAttribLPointer(idx, size, type, stride, pointer);
         glEnableVertexAttribArray(idx);
+    }
+
+    void vertex_array::set_element_buffer(const element_buffer &ebo) noexcept {
+        glBindVertexArray(m_id);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.id());
+        glBindVertexArray(0);
     }
 
     const char *vertex_array::err_to_string(error e) noexcept {

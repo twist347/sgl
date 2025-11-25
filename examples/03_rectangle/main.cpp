@@ -12,9 +12,9 @@ static auto VERTEX_SHADER_SOURCE = R"(
     #version 330 core
 
     layout (location = 0) in vec3 a_pos;
-    layout (location = 1) in vec3 a_color;
+    layout (location = 1) in vec4 a_color;
 
-    out vec3 color;
+    out vec4 color;
 
     void main() {
         gl_Position = vec4(a_pos, 1.0);
@@ -27,34 +27,49 @@ static auto FRAGMENT_SHADER_SOURCE = R"(
 
     out vec4 frag_color;
 
-    in vec3 color;
+    in vec4 color;
 
     void main() {
-        frag_color = vec4(color, 1.0);
+        frag_color = color;
     }
 )";
 
 struct vertex {
     sgl::gl_float pos[3];
-    sgl::gl_float color[3];
+    sgl::color color;
 };
 
 int main() {
     auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
-    constexpr std::array<vertex, 3> vertices = {
+    constexpr std::array<vertex, 4> vertices = {
         {
-            {.pos = {-0.5f, -0.5f, 0.f}, .color = {1.f, 0.f, 0.f}},
-            {.pos = {0.5f, -0.5f, 0.f}, .color = {0.f, 1.f, 0.f}},
-            {.pos = {0.0f, 0.5f, 0.f}, .color = {0.f, 0.f, 1.f}},
+            {{0.5f, 0.5f, 0.0f}, sgl::colors::RED},
+            {{0.5f, -0.5f, 0.0f}, sgl::colors::GREEN},
+            {{-0.5f, -0.5f, 0.0f}, sgl::colors::BLUE},
+            {{-0.5f, 0.5f, 0.0f}, sgl::colors::BLACK},
         }
     };
 
-    const auto vao = sgl::vertex_array::create_or_panic();
+    constexpr std::array<sgl::gl_ushort, 6> indices = {
+        {
+            0, 1, 3,
+            1, 2, 3
+        }
+    };
+
+    auto vao = sgl::vertex_array::create_or_panic();
 
     const auto vbo = sgl::vertex_buffer::create_or_panic(
         vertices.data(),
         sizeof(vertices),
+        GL_STATIC_DRAW
+    );
+
+    const auto ebo = sgl::element_buffer::create_or_panic(
+        indices.data(),
+        sizeof(indices),
+        GL_UNSIGNED_SHORT,
         GL_STATIC_DRAW
     );
 
@@ -71,12 +86,14 @@ int main() {
     vao.attrib_pointer_f(
         vbo,
         1,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
+        4,
+        GL_UNSIGNED_BYTE,
+        GL_TRUE,
         sizeof(vertex),
         SGL_OFFSET_OF(vertex, color)
     );
+
+    vao.set_element_buffer(ebo);
 
     const auto shader = sgl::shader::create_from_source_or_panic(VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
 
@@ -85,7 +102,7 @@ int main() {
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();
 
-        sgl::render::draw_arrays(GL_TRIANGLES, shader, vao, 0, 3);
+        sgl::render::draw_elements(GL_TRIANGLES, shader, vao, ebo);
 
         window.swap_buffers();
         sgl::window::poll_events();
