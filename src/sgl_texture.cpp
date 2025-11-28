@@ -13,11 +13,11 @@ namespace sgl {
     // ctors and assignments
 
     texture_2d::texture_2d(texture_2d &&other) noexcept
-        : m_id(std::exchange(other.m_id, 0))
-          , m_width(std::exchange(other.m_width, 0))
-          , m_height(std::exchange(other.m_height, 0))
-          , m_internal_format(std::exchange(other.m_internal_format, 0))
-          , m_format(std::exchange(other.m_format, 0)) {
+        : m_id(std::exchange(other.m_id, 0)),
+          m_width(std::exchange(other.m_width, 0)),
+          m_height(std::exchange(other.m_height, 0)),
+          m_internal_format(std::exchange(other.m_internal_format, 0)),
+          m_format(std::exchange(other.m_format, 0)) {
     }
 
     texture_2d &texture_2d::operator=(texture_2d &&other) noexcept {

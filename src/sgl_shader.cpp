@@ -3,6 +3,7 @@
 #include <cassert>
 #include <fstream>
 #include <string>
+#include <utility>
 
 #include "glad/glad.h"
 
@@ -10,17 +11,9 @@
 #include "internal/sgl_io.h"
 
 namespace sgl {
-    // ctors
+    // ctors and assignments
 
-    shader::~shader() {
-        if (m_program != 0) {
-            glDeleteProgram(m_program);
-            m_program = 0;
-        }
-    }
-
-    shader::shader(shader &&other) noexcept : m_program(other.m_program) {
-        other.m_program = 0;
+    shader::shader(shader &&other) noexcept : m_program(std::exchange(other.m_program, 0)) {
     }
 
     shader &shader::operator=(shader &&other) noexcept {
@@ -28,14 +21,15 @@ namespace sgl {
             return *this;
         }
 
-        if (m_program != 0) {
-            glDeleteProgram(m_program);
-        }
+        destroy();
 
-        m_program = other.m_program;
-        other.m_program = 0;
+        m_program = std::exchange(other.m_program, 0);
 
         return *this;
+    }
+
+    shader::~shader() {
+        destroy();
     }
 
     // fabrics
@@ -348,6 +342,13 @@ namespace sgl {
             case shader_uniform_type::MAT4:
                 glUniformMatrix4fv(loc, count, GL_FALSE, static_cast<const gl_float *>(value));
                 break;
+        }
+    }
+
+    void shader::destroy() noexcept {
+        if (m_program != 0) {
+            glDeleteProgram(m_program);
+            m_program = 0;
         }
     }
 }
