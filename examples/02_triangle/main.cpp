@@ -35,7 +35,7 @@ int main() {
         GL_STATIC_DRAW
     );
 
-    vao.attrib_pointer_f(
+    vao.attrib_pointer(
         vbo,
         0,
         3,
@@ -45,7 +45,7 @@ int main() {
         SGL_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer_f(
+    vao.attrib_pointer(
         vbo,
         1,
         3,
@@ -57,7 +57,7 @@ int main() {
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    sgl::render::set_clear_color(sgl::colors::WHITE);
+    sgl::render::set_clear_color(sgl::colors::GRAY);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();

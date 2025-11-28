@@ -7,6 +7,7 @@
 #include "glad/glad.h"
 
 #include "internal/sgl_log.h"
+#include "internal/sgl_io.h"
 
 namespace sgl {
     // ctors
@@ -95,12 +96,12 @@ namespace sgl {
         std::string vs_src;
         std::string fs_src;
 
-        if (!read_text_file(vertex_path, vs_src)) {
+        if (!detail::read_text_file(vertex_path, vs_src)) {
             SGL_LOG_ERROR("failed to read vertex shader file: %s", vertex_path);
             return unexpected{error::FILE_IO_FAILED};
         }
 
-        if (!read_text_file(fragment_path, fs_src)) {
+        if (!detail::read_text_file(fragment_path, fs_src)) {
             SGL_LOG_ERROR("failed to read fragment shader file: %s", fragment_path);
             return unexpected{error::FILE_IO_FAILED};
         }
@@ -223,41 +224,12 @@ namespace sgl {
                 out_err = error::VERTEX_COMPILE_FAILED;
             } else if (type == GL_FRAGMENT_SHADER) {
                 out_err = error::FRAGMENT_COMPILE_FAILED;
-            } else {
-                out_err = error::VERTEX_COMPILE_FAILED;
             }
 
             return 0;
         }
 
         return shader;
-    }
-
-    bool shader::read_text_file(const char *path, std::string &out_src) noexcept {
-        assert(path);
-
-        std::ifstream f(path, std::ios::binary);
-        if (!f) {
-            return false;
-        }
-
-        f.seekg(0, std::ios::end);
-        const auto len = f.tellg();
-        if (len < 0) {
-            return false;
-        }
-
-        out_src.resize(len);
-
-        f.seekg(0, std::ios::beg);
-        if (len > 0) {
-            f.read(out_src.data(), len);
-            if (!f) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     bool shader::check_compile(gl_uint shader_id, const char *type_name) noexcept {
@@ -378,4 +350,4 @@ namespace sgl {
                 break;
         }
     }
-} // namespace sgl
+}

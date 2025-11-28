@@ -116,8 +116,6 @@ namespace sgl {
 
         static gl_uint compile_shader(gl_enum type, const char *src, error &out_err) noexcept;
 
-        static bool read_text_file(const char *path, std::string &out_src) noexcept;
-
         static bool check_compile(gl_uint shader_id, const char *type_name) noexcept;
 
         static bool check_link(gl_uint program) noexcept;
@@ -133,4 +131,4 @@ namespace sgl {
     private:
         gl_uint m_program = 0;
     };
-} // namespace sgl
+}

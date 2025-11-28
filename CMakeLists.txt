@@ -32,6 +32,8 @@ add_library(
         src/sgl_vertex_array.cpp
         src/sgl_info.cpp
         src/sgl_backend.cpp
+        src/sgl_io.cpp
+        src/sgl_texture.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)

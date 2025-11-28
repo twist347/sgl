@@ -7,7 +7,7 @@ static constexpr auto SCREEN_TITLE = __FILE__;
 int main() {
     auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
-    sgl::render::set_clear_color(sgl::colors::WHITE);
+    sgl::render::set_clear_color(sgl::colors::GRAY);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();

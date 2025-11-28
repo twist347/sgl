@@ -7,7 +7,7 @@
 #include "internal/sgl_util.h"
 #include "internal/sgl_backend.h"
 
-namespace sgl::info {
+namespace sgl::detail {
     void print_info() noexcept {
         SGL_ASSERT(detail::backend::ensure_glfw());
         SGL_ASSERT(detail::backend::ensure_glad());
@@ -23,12 +23,11 @@ namespace sgl::info {
         glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
         glGetIntegerv(GL_NUM_EXTENSIONS, &n_ext);
 
-        const char *profile_str =
-                profile & GL_CONTEXT_CORE_PROFILE_BIT
-                    ? "Core"
-                    : profile & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT
-                          ? "Compatibility"
-                          : "Unknown";
+        const char *profile_str = profile & GL_CONTEXT_CORE_PROFILE_BIT
+                                      ? "Core"
+                                      : profile & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT
+                                            ? "Compatibility"
+                                            : "Unknown";
 
 
         SGL_LOG_INFO("Version:    %d.%d (%s)", major, minor, version ? version : "?");

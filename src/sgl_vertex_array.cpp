@@ -70,7 +70,7 @@ namespace sgl {
         glDisableVertexAttribArray(idx);
     }
 
-    void vertex_array::attrib_pointer_f(
+    void vertex_array::attrib_pointer(
         const vertex_buffer &vbo,
         gl_uint idx,
         gl_int size,

@@ -73,7 +73,7 @@ namespace sgl {
         glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
         glfwSetKeyCallback(handle, key_callback);
 
-        info::print_info();
+        detail::print_info();
 
         return window{handle};
     }

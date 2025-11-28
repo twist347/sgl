@@ -22,7 +22,7 @@ namespace sgl::detail::backend {
         if (s_glad_initialized) {
             return true;
         }
-        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
             return false;
         }
         s_glad_initialized = true;

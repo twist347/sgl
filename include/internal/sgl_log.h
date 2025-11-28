@@ -27,9 +27,6 @@ namespace sgl {
 
     template<typename... Args>
     void log(log_level_e level, const char *fmt, Args &&... args) noexcept {
-        assert(fmt);
-        assert(level < log_level_e::COUNT);
-
         FILE *out = detail::stream_for(level);
 
         std::fprintf(out, "[%s]: ", detail::level_name(level));

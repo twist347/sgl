@@ -48,7 +48,7 @@ namespace sgl {
 
         void disable_attrib(gl_uint idx) const noexcept;
 
-        void attrib_pointer_f(
+        void attrib_pointer(
             const vertex_buffer &vbo,
             gl_uint idx,
             gl_int size,

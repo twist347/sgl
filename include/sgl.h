@@ -1,5 +1,7 @@
 #pragma once
 
+// public headers
+
 #include "internal/sgl_window.h"
 #include "internal/sgl_util.h"
 #include "internal/sgl_render.h"
@@ -11,5 +13,5 @@
 #include "internal/sgl_vertex_buffer.h"
 #include "internal/sgl_element_buffer.h"
 #include "internal/sgl_vertex_array.h"
-#include "internal/sgl_info.h"
 #include "internal/sgl_math.h"
+#include "internal/sgl_texture.h"
