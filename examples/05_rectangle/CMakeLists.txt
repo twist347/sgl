@@ -1,4 +1,4 @@
-set(T 02_triangle)
+set(T 05_rectangle)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)

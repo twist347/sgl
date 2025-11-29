@@ -23,32 +23,4 @@ namespace sgl::render {
     void clear_color_buffer() noexcept {
         glClear(GL_COLOR_BUFFER_BIT);
     }
-
-    void draw_arrays(
-        gl_enum mode,
-        const shader &shader,
-        const vertex_array &vao,
-        gl_int first,
-        gl_sizei count
-    ) noexcept {
-        shader.use();
-        vao.bind();
-
-        glDrawArrays(mode, first, count);
-        vertex_array::unbind();
-    }
-
-    void draw_elements(
-        gl_enum mode,
-        const shader &shader,
-        const vertex_array &vao,
-        const element_buffer &ebo
-    ) noexcept {
-        shader.use();
-        vao.bind();
-
-        glDrawElements(mode, ebo.count(), ebo.type(), nullptr);
-
-        vertex_array::unbind();
-    }
 }

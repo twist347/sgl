@@ -41,47 +41,22 @@ int main() {
 
     auto vao = sgl::vertex_array::create_or_panic();
 
-    const auto vbo = sgl::vertex_buffer::create_or_panic(
-        vertices.data(),
-        sizeof(vertices),
-        GL_STATIC_DRAW
-    );
+    const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
     const auto ebo = sgl::element_buffer::create_or_panic(
-        indices.data(),
-        sizeof(indices),
-        GL_UNSIGNED_SHORT,
-        GL_STATIC_DRAW
+        indices.data(), sizeof(indices),GL_UNSIGNED_SHORT,GL_STATIC_DRAW
     );
 
     vao.attrib_pointer(
-        vbo,
-        0,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(vertex),
-        SGL_OFFSET_OF(vertex, pos)
+        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo,
-        1,
-        4,
-        GL_UNSIGNED_BYTE,
-        GL_TRUE,
-        sizeof(vertex),
-        SGL_OFFSET_OF(vertex, color)
+        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex),SGL_OFFSET_OF(vertex, color)
     );
 
     vao.attrib_pointer(
-        vbo,
-        2,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(vertex),
-        SGL_OFFSET_OF(vertex, tex)
+        vbo, 2, 2,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, tex)
     );
 
     vao.set_element_buffer(ebo);
@@ -99,7 +74,7 @@ int main() {
         shader.use();
         texture.bind(v0);
         vao.bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, nullptr);
 
         window.swap_buffers();
         sgl::window::poll_events();
