@@ -5,10 +5,10 @@
 
 namespace sgl {
     enum class vertex_buffer_error {
-        INVALID_PARAMS = 0,
-        GL_GEN_BUFFERS_FAILED,
-        GL_ALLOC_FAILED,
-        COUNT
+        invalid_params = 0,
+        gl_gen_buffers_failed,
+        gl_alloc_failed,
+        count
     };
 
     class vertex_buffer {
@@ -48,14 +48,14 @@ namespace sgl {
         [[nodiscard]] gl_sizeiptr get_size() const noexcept { return m_size; }
         [[nodiscard]] gl_enum get_usage() const noexcept { return m_usage; }
 
-        static const char *err_to_str(error e) noexcept;
+        constexpr static const char *err_to_str(error e) noexcept;
 
     private:
-        static bool check_created_size_bound(gl_enum target, gl_sizeiptr expected);
+        static bool check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept;
 
     private:
         explicit vertex_buffer(gl_uint id, gl_sizeiptr size, gl_enum usage) noexcept
-            : m_id(id), m_size(size), m_usage(usage) {
+            : m_id{id}, m_size{size}, m_usage{usage} {
         }
 
         void destroy() noexcept;

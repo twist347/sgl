@@ -8,12 +8,11 @@
 #include "internal/sgl_element_buffer.h"
 #include "internal/sgl_log.h"
 #include "internal/sgl_util.h"
-#include "internal/sgl_type.h"
 
 namespace sgl {
     // ctors and assignments
 
-    vertex_array::vertex_array(vertex_array &&other) noexcept : m_id(std::exchange(other.m_id, 0)) {
+    vertex_array::vertex_array(vertex_array &&other) noexcept : m_id{std::exchange(other.m_id, 0)} {
     }
 
     vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
@@ -39,7 +38,7 @@ namespace sgl {
         glGenVertexArrays(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenVertexArrays() returned 0");
-            return unexpected{error::GL_GEN_FAILED};
+            return unexpected{error::gl_gen_failed};
         }
         return vertex_array{id};
     }
@@ -47,7 +46,7 @@ namespace sgl {
     vertex_array vertex_array::create_or_panic() noexcept {
         auto res = create();
         if (!res) {
-            SGL_LOG_FATAL("failed to create vertex_array: %s", err_to_string(res.error()));
+            SGL_LOG_FATAL("failed to create vertex_array: %s", err_to_str(res.error()));
         }
         return std::move(*res);
     }
@@ -62,11 +61,11 @@ namespace sgl {
         glBindVertexArray(0);
     }
 
-    void vertex_array::enable_attrib(gl_uint idx) const noexcept {
+    void vertex_array::enable_attrib(gl_uint idx) noexcept {
         glEnableVertexAttribArray(idx);
     }
 
-    void vertex_array::disable_attrib(gl_uint idx) const noexcept {
+    void vertex_array::disable_attrib(gl_uint idx) noexcept {
         glDisableVertexAttribArray(idx);
     }
 
@@ -116,15 +115,19 @@ namespace sgl {
         glEnableVertexAttribArray(idx);
     }
 
-    void vertex_array::set_element_buffer(const element_buffer &ebo) noexcept {
+    void vertex_array::set_element_buffer(const element_buffer &ebo) const noexcept {
+        GLint prev_vao = 0;
+        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prev_vao);
+
         glBindVertexArray(m_id);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.id());
-        glBindVertexArray(0);
+
+        glBindVertexArray(prev_vao);
     }
 
-    const char *vertex_array::err_to_string(error e) noexcept {
+    constexpr const char *vertex_array::err_to_str(error e) noexcept {
         switch (e) {
-            case error::GL_GEN_FAILED: return "glGenVertexArrays() failed";
+            case error::gl_gen_failed: return "glGenVertexArrays() failed";
             default: return "unknown vertex_array_error";
         }
     }

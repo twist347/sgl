@@ -8,8 +8,8 @@ namespace sgl {
     class element_buffer;
 
     enum class vertex_array_error {
-        GL_GEN_FAILED = 0,
-        COUNT
+        gl_gen_failed = 0,
+        count
     };
 
     class vertex_array {
@@ -30,6 +30,7 @@ namespace sgl {
         ~vertex_array();
 
         // fabrics
+
         static result create() noexcept;
 
         // or panic wrapper
@@ -44,9 +45,9 @@ namespace sgl {
 
         [[nodiscard]] gl_uint id() const noexcept { return m_id; }
 
-        void enable_attrib(gl_uint idx) const noexcept;
+        static void enable_attrib(gl_uint idx) noexcept;
 
-        void disable_attrib(gl_uint idx) const noexcept;
+        static void disable_attrib(gl_uint idx) noexcept;
 
         void attrib_pointer(
             const vertex_buffer &vbo,
@@ -76,16 +77,16 @@ namespace sgl {
             const void *pointer
         ) const noexcept;
 
-        void set_element_buffer(const element_buffer &ebo) noexcept;
+        void set_element_buffer(const element_buffer &ebo) const noexcept;
 
-        static const char *err_to_string(error e) noexcept;
+        constexpr static const char *err_to_str(error e) noexcept;
 
     private:
-        explicit vertex_array(gl_uint id) noexcept : m_id(id) {
+        explicit vertex_array(gl_uint id) noexcept : m_id{id} {
         }
 
         void destroy() noexcept;
 
         gl_uint m_id = 0;
     };
-} // namespace sgl
+}

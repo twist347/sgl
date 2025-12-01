@@ -1,4 +1,4 @@
-set(T 06_texture)
+set(T 07_texture)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)

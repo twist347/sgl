@@ -3,16 +3,15 @@
 #include <cstdlib>
 #include <utility>
 #include <cstdio>
-#include <cassert>
 
-#define SGL_LOG_INFO(fmt, ...)   ::sgl::log(::sgl::log_level_e::INFO,   (fmt), ##__VA_ARGS__)
-#define SGL_LOG_WARN(fmt, ...)   ::sgl::log(::sgl::log_level_e::WARNING,(fmt), ##__VA_ARGS__)
-#define SGL_LOG_ERROR(fmt, ...)  ::sgl::log(::sgl::log_level_e::ERROR,  (fmt), ##__VA_ARGS__)
-#define SGL_LOG_FATAL(fmt, ...)  ::sgl::log(::sgl::log_level_e::FATAL,  (fmt), ##__VA_ARGS__)
+#define SGL_LOG_INFO(fmt, ...)  ::sgl::log(::sgl::log_level_e::INFO,   (fmt) __VA_OPT__(,) __VA_ARGS__)
+#define SGL_LOG_WARN(fmt, ...)  ::sgl::log(::sgl::log_level_e::WARNING,(fmt) __VA_OPT__(,) __VA_ARGS__)
+#define SGL_LOG_ERROR(fmt, ...) ::sgl::log(::sgl::log_level_e::ERROR,  (fmt) __VA_OPT__(,) __VA_ARGS__)
+#define SGL_LOG_FATAL(fmt, ...) ::sgl::log(::sgl::log_level_e::FATAL,  (fmt) __VA_OPT__(,) __VA_ARGS__)
 
 namespace sgl {
     enum class log_level_e {
-        INFO,
+        INFO = 0,
         WARNING,
         ERROR,
         FATAL,

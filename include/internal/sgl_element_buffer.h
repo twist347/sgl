@@ -5,10 +5,10 @@
 
 namespace sgl {
     enum class element_buffer_error {
-        INVALID_PARAMS = 0,
-        GL_GEN_FAILED,
-        GL_ALLOC_FAILED,
-        COUNT
+        invalid_params = 0,
+        gl_gen_failed,
+        gl_alloc_failed,
+        count
     };
 
     class element_buffer {
@@ -35,10 +35,7 @@ namespace sgl {
         // or panic wrapper
 
         static element_buffer create_or_panic(
-            const void *data,
-            gl_sizeiptr size,
-            gl_enum index_type,
-            gl_enum usage
+            const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
         ) noexcept;
 
         // api
@@ -55,16 +52,16 @@ namespace sgl {
         [[nodiscard]] gl_enum type() const noexcept { return m_type; }
         [[nodiscard]] gl_enum usage() const noexcept { return m_usage; }
 
-        static const char *err_to_string(error e) noexcept;
+        constexpr static const char *err_to_str(error e) noexcept;
 
     private:
-        static gl_sizeiptr index_type_size(gl_enum type) noexcept;
+        constexpr static gl_sizeiptr index_type_size(gl_enum type) noexcept;
 
         static bool check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept;
 
     private:
         explicit element_buffer(gl_uint id, gl_sizeiptr size, gl_sizei count, gl_enum type, gl_enum usage) noexcept
-            : m_id(id), m_size(size), m_count(count), m_type(type), m_usage(usage) {
+            : m_id{id}, m_size{size}, m_count{count}, m_type{type}, m_usage{usage} {
         }
 
         void destroy() noexcept;

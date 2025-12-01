@@ -3,14 +3,19 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include "internal/sgl_log.h"
+
 namespace sgl::detail::backend {
     static bool s_glfw_initialized = false;
     static bool s_glad_initialized = false;
+
+    static void glfw_error_callback(int code, const char* desc);
 
     bool ensure_glfw() noexcept {
         if (s_glfw_initialized) {
             return true;
         }
+        glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
             return false;
         }
@@ -40,5 +45,9 @@ namespace sgl::detail::backend {
     void reset() noexcept {
         s_glfw_initialized = false;
         s_glad_initialized = false;
+    }
+
+    static void glfw_error_callback(int code, const char* desc) {
+        SGL_LOG_ERROR("GLFW error %d: %s", code, desc ? desc : "?");
     }
 }

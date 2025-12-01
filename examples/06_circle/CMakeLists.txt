@@ -1,4 +1,4 @@
-set(T circle)
+set(T 06_circle)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)

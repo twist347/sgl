@@ -9,11 +9,11 @@ struct GLFWwindow;
 
 namespace sgl {
     enum class window_error {
-        INVALID_PARAMS = 0,
-        GLFW_INIT_FAILED,
-        GLFW_CREATE_WINDOW_FAILED,
-        GLAD_LOAD_FAILED,
-        COUNT
+        invalid_params = 0,
+        glfw_init_failed,
+        glfw_create_window_failed,
+        glad_load_failed,
+        count
     };
 
     class window {
@@ -51,28 +51,31 @@ namespace sgl {
 
         // api
 
-        void make_current();
+        void make_current() const noexcept;
 
-        void set_vsync(bool enabled);
+        void set_vsync(bool enabled) const noexcept;
 
-        [[nodiscard]] bool should_close() const;
+        [[nodiscard]] bool should_close() const noexcept;
 
-        void swap_buffers();
+        void swap_buffers() const noexcept;
 
         [[nodiscard]] int width() const noexcept;
 
         [[nodiscard]] int height() const noexcept;
 
-        static void poll_events();
+        static void poll_events() noexcept;
 
-        static const char *err_to_str(error err) noexcept;
+        constexpr static const char *err_to_str(error err) noexcept;
 
     private:
-        explicit window(GLFWwindow *handle) noexcept : m_window(handle) {
+        explicit window(GLFWwindow *handle) noexcept : m_window{handle} {
         }
 
-        static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-        static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+        static void framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept;
+
+        static void key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept;
+
+        static void init_viewport(GLFWwindow *handle) noexcept;
 
         static int s_window_count;
 

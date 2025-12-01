@@ -17,14 +17,14 @@ struct vertex {
 };
 
 int main() {
-    auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {.pos = {-0.5f, 0.5f, 0.f}, .color = sgl::colors::RED},
-            {.pos = {0.5f, 0.5f, 0.f}, .color = sgl::colors::GREEN},
-            {.pos = {-0.5f, -0.5f, 0.f}, .color = sgl::colors::BLUE},
-            {.pos = {0.5f, -0.5f, 0.f}, .color = sgl::colors::YELLOW},
+            {.pos = {-0.5f, 0.5f, 0.f}, .color = sgl::colors::red},
+            {.pos = {0.5f, 0.5f, 0.f}, .color = sgl::colors::green},
+            {.pos = {-0.5f, -0.5f, 0.f}, .color = sgl::colors::blue},
+            {.pos = {0.5f, -0.5f, 0.f}, .color = sgl::colors::yellow},
         }
     };
 
@@ -33,11 +33,11 @@ int main() {
     const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, pos)
+        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex),SGL_OFFSET_OF(vertex, color)
+        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
@@ -45,7 +45,7 @@ int main() {
     glEnable(GL_PROGRAM_POINT_SIZE);
     glPointSize(30.f);
 
-    sgl::render::set_clear_color(sgl::colors::GRAY);
+    sgl::render::set_clear_color(sgl::colors::gray);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();

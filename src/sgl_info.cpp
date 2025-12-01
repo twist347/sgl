@@ -9,8 +9,8 @@
 
 namespace sgl::detail {
     void print_info() noexcept {
-        SGL_ASSERT(detail::backend::ensure_glfw());
-        SGL_ASSERT(detail::backend::ensure_glad());
+        SGL_VERIFY(detail::backend::ensure_glfw());
+        SGL_VERIFY(detail::backend::ensure_glad());
 
         gl_int major = 0, minor = 0, profile = 0, n_ext = 0;
         auto vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
@@ -23,16 +23,15 @@ namespace sgl::detail {
         glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
         glGetIntegerv(GL_NUM_EXTENSIONS, &n_ext);
 
-        const char *profile_str = profile & GL_CONTEXT_CORE_PROFILE_BIT
-                                      ? "Core"
-                                      : profile & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT
-                                            ? "Compatibility"
-                                            : "Unknown";
-
+        auto profile_str = "Unknown";
+        if (profile & GL_CONTEXT_CORE_PROFILE_BIT) {
+            profile_str = "Core";
+        } else if (profile & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) {
+            profile_str = "Compatibility";
+        }
 
         SGL_LOG_INFO("Version:    %d.%d (%s)", major, minor, version ? version : "?");
         SGL_LOG_INFO("GLSL:       %s", glsl ? glsl : "?");
-        SGL_LOG_INFO("Vendor:     %s", vendor ? vendor : "?");
         SGL_LOG_INFO("Vendor:     %s", vendor ? vendor : "?");
         SGL_LOG_INFO("Renderer:   %s", renderer ? renderer : "?");
         SGL_LOG_INFO("Profile:    %s", profile_str);

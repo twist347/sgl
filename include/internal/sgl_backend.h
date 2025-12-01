@@ -7,5 +7,7 @@ namespace sgl::detail::backend {
 
     bool is_glfw_initialized() noexcept;
 
+    bool is_glad_initialized() noexcept;
+
     void reset() noexcept;
 }

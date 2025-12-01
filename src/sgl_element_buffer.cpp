@@ -9,23 +9,14 @@
 #include "internal/sgl_type.h"
 
 namespace sgl {
-    const char *element_buffer::err_to_string(error e) noexcept {
-        switch (e) {
-            case error::INVALID_PARAMS: return "invalid params";
-            case error::GL_GEN_FAILED: return "glGenBuffers() failed";
-            case error::GL_ALLOC_FAILED: return "glBufferData() failed to allocate";
-            default: return "unknown element_buffer_error";
-        }
-    }
-
     // ctors and assignments
 
     element_buffer::element_buffer(element_buffer &&other) noexcept
-        : m_id(std::exchange(other.m_id, 0)),
-          m_size(std::exchange(other.m_size, 0)),
-          m_count(std::exchange(other.m_count, 0)),
-          m_type(std::exchange(other.m_type, 0)),
-          m_usage(std::exchange(other.m_usage, 0)) {
+        : m_id{std::exchange(other.m_id, 0)},
+          m_size{std::exchange(other.m_size, 0)},
+          m_count{std::exchange(other.m_count, 0)},
+          m_type{std::exchange(other.m_type, 0)},
+          m_usage{std::exchange(other.m_usage, 0)} {
     }
 
     element_buffer &element_buffer::operator=(element_buffer &&other) noexcept {
@@ -62,14 +53,14 @@ namespace sgl {
                 "element_buffer::create(): invalid params (size=%td, type=0x%x)",
                 size, static_cast<unsigned int>(index_type)
             );
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
         gl_uint id = 0;
         glGenBuffers(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenBuffers() returned 0");
-            return unexpected(error::GL_GEN_FAILED);
+            return unexpected(error::gl_gen_failed);
         }
 
         GLint prev_vao = 0;
@@ -91,7 +82,7 @@ namespace sgl {
         if (!ok) {
             SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
             glDeleteBuffers(1, &id);
-            return unexpected{error::GL_ALLOC_FAILED};
+            return unexpected{error::gl_alloc_failed};
         }
 
         const gl_sizei count = size / idx_size;
@@ -100,14 +91,11 @@ namespace sgl {
     }
 
     element_buffer element_buffer::create_or_panic(
-        const void *data,
-        gl_sizeiptr size,
-        gl_enum index_type,
-        gl_enum usage
+        const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
     ) noexcept {
         auto res = create(data, size, index_type, usage);
         if (!res) {
-            SGL_LOG_FATAL("failed to create element_buffer: %s", err_to_string(res.error()));
+            SGL_LOG_FATAL("failed to create element_buffer: %s", err_to_str(res.error()));
         }
         return std::move(*res);
     }
@@ -155,9 +143,18 @@ namespace sgl {
         m_count = size / idx_size;
     }
 
+    constexpr const char *element_buffer::err_to_str(error e) noexcept {
+        switch (e) {
+            case error::invalid_params: return "invalid params";
+            case error::gl_gen_failed: return "glGenBuffers() failed";
+            case error::gl_alloc_failed: return "glBufferData() failed to allocate";
+            default: return "unknown element_buffer_error";
+        }
+    }
+
     // internal
 
-    gl_sizeiptr element_buffer::index_type_size(gl_enum type) noexcept {
+    constexpr gl_sizeiptr element_buffer::index_type_size(gl_enum type) noexcept {
         switch (type) {
             case GL_UNSIGNED_BYTE: return sizeof(GLubyte);
             case GL_UNSIGNED_SHORT: return sizeof(GLushort);
@@ -168,7 +165,7 @@ namespace sgl {
 
     bool element_buffer::check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept {
         GLint64 actual = 0;
-        glGetBufferParameteri64v(target,GL_BUFFER_SIZE, &actual);
+        glGetBufferParameteri64v(target, GL_BUFFER_SIZE, &actual);
         return actual == expected;
     }
 

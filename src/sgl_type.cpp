@@ -25,4 +25,7 @@ namespace {
 
     static_assert(std::is_same_v<sgl::gl_intptr, GLintptr>);
     static_assert(std::is_same_v<sgl::gl_sizeiptr, GLsizeiptr>);
+
+    static_assert(sizeof(sgl::gl_intptr) == sizeof(void *));
+    static_assert(sizeof(sgl::gl_sizeiptr) == sizeof(void *));
 }

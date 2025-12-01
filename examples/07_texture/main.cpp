@@ -19,16 +19,16 @@ struct vertex {
 };
 
 int main() {
-    auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
     const auto texture = sgl::texture_2d::create_from_file_or_panic(TEXTURE_PATH);
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {{0.5f, 0.5f, 0.0f}, sgl::colors::RED, {1.0f, 1.0f}}, // right top
-            {{0.5f, -0.5f, 0.0f}, sgl::colors::GREEN, {1.0f, 0.0f}}, // right bottom
-            {{-0.5f, -0.5f, 0.0f}, sgl::colors::BLUE, {0.0f, 0.0f}}, // left  bottom
-            {{-0.5f, 0.5f, 0.0f}, sgl::colors::MAGENTA, {0.0f, 1.0f}}, // left  top
+            {{0.5f, 0.5f, 0.0f}, sgl::colors::red, {1.0f, 1.0f}}, // right top
+            {{0.5f, -0.5f, 0.0f}, sgl::colors::green, {1.0f, 0.0f}}, // right bottom
+            {{-0.5f, -0.5f, 0.0f}, sgl::colors::blue, {0.0f, 0.0f}}, // left bottom
+            {{-0.5f, 0.5f, 0.0f}, sgl::colors::magenta, {0.0f, 1.0f}}, // left top
         }
     };
 
@@ -48,15 +48,15 @@ int main() {
     );
 
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, pos)
+        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex),SGL_OFFSET_OF(vertex, color)
+        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     vao.attrib_pointer(
-        vbo, 2, 2,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, tex)
+        vbo, 2, 2,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, tex)
     );
 
     vao.set_element_buffer(ebo);
@@ -66,7 +66,7 @@ int main() {
     constexpr sgl::gl_int v0 = 0;
     shader.set_uniform("tex0", &v0, sgl::shader_uniform_type::INT);
 
-    sgl::render::set_clear_color(sgl::colors::GRAY);
+    sgl::render::set_clear_color(sgl::colors::gray);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();

@@ -17,14 +17,14 @@ struct vertex {
 };
 
 int main() {
-    auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {{0.5f, 0.5f, 0.0f}, sgl::colors::RED},
-            {{0.5f, -0.5f, 0.0f}, sgl::colors::GREEN},
-            {{-0.5f, -0.5f, 0.0f}, sgl::colors::BLUE},
-            {{-0.5f, 0.5f, 0.0f}, sgl::colors::MAGENTA},
+            {{0.5f, 0.5f, 0.0f}, sgl::colors::red},
+            {{0.5f, -0.5f, 0.0f}, sgl::colors::green},
+            {{-0.5f, -0.5f, 0.0f}, sgl::colors::blue},
+            {{-0.5f, 0.5f, 0.0f}, sgl::colors::magenta},
         }
     };
 
@@ -44,18 +44,18 @@ int main() {
     );
 
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex),SGL_OFFSET_OF(vertex, pos)
+        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex),SGL_OFFSET_OF(vertex, color)
+        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     vao.set_element_buffer(ebo);
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    sgl::render::set_clear_color(sgl::colors::GRAY);
+    sgl::render::set_clear_color(sgl::colors::gray);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();

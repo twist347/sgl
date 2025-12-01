@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "glad/glad.h"
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 #include "internal/sgl_log.h"
 #include "internal/sgl_util.h"
@@ -15,7 +15,7 @@ namespace sgl {
 
     // ctors
 
-    window::window(window &&other) noexcept : m_window(std::exchange(other.m_window, nullptr)) {
+    window::window(window &&other) noexcept : m_window{std::exchange(other.m_window, nullptr)} {
     }
 
     window &window::operator=(window &&other) noexcept {
@@ -38,12 +38,15 @@ namespace sgl {
 
     window::result window::create(int width, int height, const char *title) noexcept {
         if (width <= 0 || height <= 0 || !title) {
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
         if (!detail::backend::ensure_glfw()) {
-            return unexpected{error::GLFW_INIT_FAILED};
+            return unexpected{error::glfw_init_failed};
         }
+
+        // reset
+        glfwDefaultWindowHints();
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -54,26 +57,26 @@ namespace sgl {
 
         GLFWwindow *handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
         if (!handle) {
-            return unexpected{error::GLFW_CREATE_WINDOW_FAILED};
+            return unexpected{error::glfw_create_window_failed};
         }
 
         glfwMakeContextCurrent(handle);
 
         if (!detail::backend::ensure_glad()) {
             glfwDestroyWindow(handle);
-            return unexpected{error::GLAD_LOAD_FAILED};
+            return unexpected{error::glad_load_failed};
         }
 
         ++s_window_count;
 
-        int fbw = 0, fbh = 0;
-        glfwGetFramebufferSize(handle, &fbw, &fbh);
-        glViewport(0, 0, fbw, fbh);
+        init_viewport(handle);
 
         glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
         glfwSetKeyCallback(handle, key_callback);
 
-        detail::print_info();
+        if (s_window_count == 1) {
+            detail::print_info();
+        }
 
         return window{handle};
     }
@@ -90,20 +93,28 @@ namespace sgl {
 
     // api
 
-    void window::make_current() {
+    void window::make_current() const noexcept {
         glfwMakeContextCurrent(m_window);
     }
 
-    void window::set_vsync(bool enabled) {
-        glfwMakeContextCurrent(m_window);
+    void window::set_vsync(bool enabled) const noexcept {
+        GLFWwindow *prev = glfwGetCurrentContext();
+        if (prev != m_window) {
+            glfwMakeContextCurrent(m_window);
+        }
+
         glfwSwapInterval(enabled ? 1 : 0);
+
+        if (prev != m_window) {
+            glfwMakeContextCurrent(prev);
+        }
     }
 
-    bool window::should_close() const {
+    bool window::should_close() const noexcept {
         return glfwWindowShouldClose(m_window) == GLFW_TRUE;
     }
 
-    void window::swap_buffers() {
+    void window::swap_buffers() const noexcept {
         glfwSwapBuffers(m_window);
     }
 
@@ -119,33 +130,39 @@ namespace sgl {
         return h;
     }
 
-    void window::poll_events() {
+    void window::poll_events() noexcept {
         glfwPollEvents();
     }
 
-    const char *window::err_to_str(window_error err) noexcept {
+    constexpr const char *window::err_to_str(window_error err) noexcept {
         switch (err) {
-            case window_error::INVALID_PARAMS: return "invalid params";
-            case window_error::GLFW_INIT_FAILED: return "glfwInit() failed";
-            case window_error::GLFW_CREATE_WINDOW_FAILED: return "glfwCreateWindow() failed";
-            case window_error::GLAD_LOAD_FAILED: return "gladLoadGLLoader() failed";
+            case window_error::invalid_params: return "invalid params";
+            case window_error::glfw_init_failed: return "glfwInit() failed";
+            case window_error::glfw_create_window_failed: return "glfwCreateWindow() failed";
+            case window_error::glad_load_failed: return "gladLoadGLLoader() failed";
             default: return "unknown window_error";
         }
     }
 
-    void window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-        SGL_UNUSED(window);
+    void window::framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept {
+        SGL_UNUSED(handle);
 
         glViewport(0, 0, width, height);
     }
 
-    void window::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    void window::key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept {
         SGL_UNUSED(scancode);
         SGL_UNUSED(mods);
 
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            glfwSetWindowShouldClose(handle, GLFW_TRUE);
         }
+    }
+
+    void window::init_viewport(GLFWwindow *handle) noexcept {
+        int fbw = 0, fbh = 0;
+        glfwGetFramebufferSize(handle, &fbw, &fbh);
+        glViewport(0, 0, fbw, fbh);
     }
 
     void window::destroy_window() noexcept {

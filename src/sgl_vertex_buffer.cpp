@@ -10,8 +10,8 @@ namespace sgl {
     // ctors and assignments
 
     vertex_buffer::vertex_buffer(vertex_buffer &&other) noexcept : m_id{std::exchange(other.m_id, 0)},
-                                                                   m_size(std::exchange(other.m_size, 0)),
-                                                                   m_usage(std::exchange(other.m_usage, 0)) {
+                                                                   m_size{std::exchange(other.m_size, 0)},
+                                                                   m_usage{std::exchange(other.m_usage, 0)} {
     }
 
     vertex_buffer &vertex_buffer::operator=(vertex_buffer &&other) noexcept {
@@ -36,14 +36,14 @@ namespace sgl {
 
     vertex_buffer::result vertex_buffer::create(const void *data, gl_sizeiptr size, gl_enum usage) noexcept {
         if (size <= 0) {
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
         gl_uint id = 0;
         glGenBuffers(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenBuffers() returned 0");
-            return unexpected{error::GL_GEN_BUFFERS_FAILED};
+            return unexpected{error::gl_gen_buffers_failed};
         }
 
         gl_int prev = 0;
@@ -59,7 +59,7 @@ namespace sgl {
         if (!ok) {
             SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
             glDeleteBuffers(1, &id);
-            return unexpected{error::GL_ALLOC_FAILED};
+            return unexpected{error::gl_alloc_failed};
         }
 
         return vertex_buffer{id, size, usage};
@@ -101,17 +101,17 @@ namespace sgl {
 
     // internal
 
-    bool vertex_buffer::check_created_size_bound(gl_enum target, gl_sizeiptr expected) {
+    bool vertex_buffer::check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept {
         GLint64 actual = 0;
         glGetBufferParameteri64v(target, GL_BUFFER_SIZE, &actual);
         return actual == expected;
     }
 
-    const char *vertex_buffer::err_to_str(error e) noexcept {
+    constexpr const char *vertex_buffer::err_to_str(error e) noexcept {
         switch (e) {
-            case error::INVALID_PARAMS: return "invalid params";
-            case error::GL_GEN_BUFFERS_FAILED: return "glGenBuffers() failed";
-            case error::GL_ALLOC_FAILED: return "glBufferData() failed to allocate";
+            case error::invalid_params: return "invalid params";
+            case error::gl_gen_buffers_failed: return "glGenBuffers() failed";
+            case error::gl_alloc_failed: return "glBufferData() failed to allocate";
             default: return "unknown vertex_buffer_error";
         }
     }
