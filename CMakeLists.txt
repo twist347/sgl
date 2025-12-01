@@ -16,9 +16,11 @@ set(GLFW_DIR ${EXTERNAL_DIR}/glfw-3.4)
 set(GLAD_DIR ${EXTERNAL_DIR}/glad)
 set(STB_IMAGE_DIR ${EXTERNAL_DIR}/stb_image)
 set(TL_DIR ${EXTERNAL_DIR}/tl)
+set(GLM_DIR ${EXTERNAL_DIR}/glm-1.0.2)
 
 add_subdirectory(${GLFW_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(${GLAD_DIR} EXCLUDE_FROM_ALL)
+add_subdirectory(${GLM_DIR} EXCLUDE_FROM_ALL)
 
 add_library(
         ${T} STATIC
