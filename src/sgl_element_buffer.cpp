@@ -1,6 +1,7 @@
 #include "internal/sgl_element_buffer.h"
 
 #include <utility>
+#include <cassert>
 
 #include "glad/glad.h"
 
@@ -60,24 +61,18 @@ namespace sgl {
         glGenBuffers(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenBuffers() returned 0");
-            return unexpected(error::gl_gen_failed);
+            return unexpected(error::gl_gen_buffers_failed);
         }
 
-        GLint prev_vao = 0;
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prev_vao);
-
-        glBindVertexArray(0);
-
-        GLint vao0_prev_ebo = 0;
-        glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &vao0_prev_ebo);
+        GLint prev_ebo = 0;
+        glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &prev_ebo);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
 
         const bool ok = check_created_size_bound(GL_ELEMENT_ARRAY_BUFFER, size);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao0_prev_ebo);
-        glBindVertexArray(prev_vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prev_ebo);
 
         if (!ok) {
             SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
@@ -85,7 +80,7 @@ namespace sgl {
             return unexpected{error::gl_alloc_failed};
         }
 
-        const gl_sizei count = size / idx_size;
+        const auto count = static_cast<gl_sizei>(size / idx_size);
 
         return element_buffer{id, size, count, index_type, usage};
     }
@@ -103,6 +98,8 @@ namespace sgl {
     // api
 
     void element_buffer::bind() const noexcept {
+        assert(m_id != 0);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
     }
 
@@ -111,10 +108,7 @@ namespace sgl {
     }
 
     void element_buffer::set_data(const void *data, gl_sizeiptr size) noexcept {
-        if (m_id == 0) {
-            SGL_LOG_ERROR("element_buffer::set_data() called on invalid buffer");
-            return;
-        }
+        assert(m_id != 0);
 
         const gl_sizeiptr idx_size = index_type_size(m_type);
         if (size <= 0 || idx_size == 0 || (size % idx_size) != 0) {
@@ -125,28 +119,16 @@ namespace sgl {
             return;
         }
 
-        GLint prev_vao = 0;
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prev_vao);
-
-        glBindVertexArray(0);
-
-        GLint vao0_prev_ebo = 0;
-        glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &vao0_prev_ebo);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, m_usage);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao0_prev_ebo);
-        glBindVertexArray(prev_vao);
-
         m_size = size;
-        m_count = size / idx_size;
+        m_count = static_cast<gl_sizei>(size / idx_size);
     }
 
     constexpr const char *element_buffer::err_to_str(error e) noexcept {
         switch (e) {
             case error::invalid_params: return "invalid params";
-            case error::gl_gen_failed: return "glGenBuffers() failed";
+            case error::gl_gen_buffers_failed: return "glGenBuffers() failed";
             case error::gl_alloc_failed: return "glBufferData() failed to allocate";
             default: return "unknown element_buffer_error";
         }

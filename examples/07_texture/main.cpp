@@ -13,9 +13,9 @@ static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
 static constexpr auto TEXTURE_PATH = "textures/img1.png";
 
 struct vertex {
-    sgl::gl_float pos[3];
-    sgl::color color;
-    sgl::gl_float tex[2];
+    sgl::gl_float pos[3]{};
+    sgl::color color{};
+    sgl::gl_float tex[2]{};
 };
 
 int main() {
@@ -25,10 +25,10 @@ int main() {
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {{0.5f, 0.5f, 0.0f}, sgl::colors::red, {1.0f, 1.0f}}, // right top
-            {{0.5f, -0.5f, 0.0f}, sgl::colors::green, {1.0f, 0.0f}}, // right bottom
-            {{-0.5f, -0.5f, 0.0f}, sgl::colors::blue, {0.0f, 0.0f}}, // left bottom
-            {{-0.5f, 0.5f, 0.0f}, sgl::colors::magenta, {0.0f, 1.0f}}, // left top
+            {.pos = {0.5f, 0.5f, 0.0f}, .color = sgl::colors::red, .tex = {1.0f, 1.0f}}, // right top
+            {.pos = {0.5f, -0.5f, 0.0f}, .color = sgl::colors::green, .tex = {1.0f, 0.0f}}, // right bottom
+            {.pos = {-0.5f, -0.5f, 0.0f}, .color = sgl::colors::blue, .tex = {0.0f, 0.0f}}, // left bottom
+            {.pos = {-0.5f, 0.5f, 0.0f}, .color = sgl::colors::magenta, .tex = {0.0f, 1.0f}}, // left top
         }
     };
 
@@ -39,7 +39,7 @@ int main() {
         }
     };
 
-    auto vao = sgl::vertex_array::create_or_panic();
+    const auto vao = sgl::vertex_array::create_or_panic();
 
     const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
@@ -47,23 +47,32 @@ int main() {
         indices.data(), sizeof(indices),GL_UNSIGNED_SHORT,GL_STATIC_DRAW
     );
 
+    vao.bind();
+    vbo.bind();
+
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+        0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     vao.attrib_pointer(
-        vbo, 2, 2,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, tex)
+        2, 2,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, tex)
     );
+
+    ebo.bind();
 
     vao.set_element_buffer(ebo);
+
+    sgl::vertex_buffer::unbind();
+    sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
     constexpr sgl::gl_int v0 = 0;
+    shader.use();
     shader.set_uniform("tex0", &v0, sgl::shader_uniform_type::INT);
 
     sgl::render::set_clear_color(sgl::colors::gray);

@@ -1,6 +1,7 @@
 #include "internal/sgl_vertex_buffer.h"
 
 #include <utility>
+#include <cassert>
 
 #include "glad/glad.h"
 
@@ -76,6 +77,8 @@ namespace sgl {
     // api
 
     void vertex_buffer::bind() const noexcept {
+        assert(m_id != 0);
+
         glBindBuffer(GL_ARRAY_BUFFER, m_id);
     }
 
@@ -83,20 +86,11 @@ namespace sgl {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void vertex_buffer::set_data(const void *data, gl_sizeiptr size) noexcept {
-        if (m_id == 0) {
-            SGL_LOG_ERROR("vertex_buffer::set_data() called on invalid buffer");
-            return;
-        }
+    void vertex_buffer::set_data(const void *data, gl_sizeiptr size) const noexcept {
+        assert(m_id != 0);
+        assert(size > 0);
 
-        GLint prev = 0;
-        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prev);
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_id);
         glBufferData(GL_ARRAY_BUFFER, size, data, m_usage);
-        glBindBuffer(GL_ARRAY_BUFFER, prev);
-
-        m_size = size;
     }
 
     // internal

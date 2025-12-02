@@ -25,14 +25,19 @@ namespace sgl {
         MAT2,
         MAT3,
         MAT4,
+
+        COUNT
     };
 
     enum class shader_error {
-        INVALID_PARAMS = 0,
-        FILE_IO_FAILED,
-        VERTEX_COMPILE_FAILED,
-        FRAGMENT_COMPILE_FAILED,
-        PROGRAM_LINK_FAILED,
+        invalid_params = 0,
+        file_io_failed,
+        gl_create_shader_failed,
+        gl_create_program_failed,
+        gl_vertex_compile_failed,
+        gl_fragment_compile_failed,
+        gl_program_link_failed,
+        count
     };
 
     class shader {
@@ -108,7 +113,7 @@ namespace sgl {
             gl_sizei count = 1
         ) const noexcept;
 
-        static const char *err_to_str(error err) noexcept;
+        constexpr static const char *err_to_str(error err) noexcept;
 
     private:
         static gl_uint compile_shader(gl_enum type, const char *src, error &out_err) noexcept;
@@ -118,7 +123,6 @@ namespace sgl {
         static bool check_link(gl_uint program) noexcept;
 
         static void set_uniform_impl(
-            gl_uint program,
             gl_int loc,
             const void *value,
             shader_uniform_type type,
@@ -126,7 +130,7 @@ namespace sgl {
         ) noexcept;
 
     private:
-        explicit shader(gl_uint program) noexcept : m_program(program) {
+        explicit shader(gl_uint program) noexcept : m_program{program} {
         }
 
         void destroy() noexcept;

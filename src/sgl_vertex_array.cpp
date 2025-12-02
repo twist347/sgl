@@ -1,13 +1,13 @@
 #include "internal/sgl_vertex_array.h"
 
 #include <utility>
+#include <cassert>
 
 #include "glad/glad.h"
 
 #include "internal/sgl_vertex_buffer.h"
 #include "internal/sgl_element_buffer.h"
 #include "internal/sgl_log.h"
-#include "internal/sgl_util.h"
 
 namespace sgl {
     // ctors and assignments
@@ -38,7 +38,7 @@ namespace sgl {
         glGenVertexArrays(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenVertexArrays() returned 0");
-            return unexpected{error::gl_gen_failed};
+            return unexpected{error::gl_gen_buffers_failed};
         }
         return vertex_array{id};
     }
@@ -54,6 +54,8 @@ namespace sgl {
     // api
 
     void vertex_array::bind() const noexcept {
+        assert(m_id != 0);
+
         glBindVertexArray(m_id);
     }
 
@@ -70,7 +72,6 @@ namespace sgl {
     }
 
     void vertex_array::attrib_pointer(
-        const vertex_buffer &vbo,
         gl_uint idx,
         gl_int size,
         gl_enum type,
@@ -78,56 +79,48 @@ namespace sgl {
         gl_sizei stride,
         const void *pointer
     ) const noexcept {
-        bind();
-        vbo.bind();
+        assert(m_id != 0);
 
         glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
         glEnableVertexAttribArray(idx);
     }
 
     void vertex_array::attrib_pointer_i(
-        const vertex_buffer &vbo,
         gl_uint idx,
         gl_int size,
         gl_enum type,
         gl_sizei stride,
         const void *pointer
     ) const noexcept {
-        bind();
-        vbo.bind();
+        assert(m_id != 0);
 
         glVertexAttribIPointer(idx, size, type, stride, pointer);
         glEnableVertexAttribArray(idx);
     }
 
     void vertex_array::attrib_pointer_l(
-        const vertex_buffer &vbo,
         gl_uint idx,
         gl_int size,
         gl_enum type,
         gl_sizei stride,
         const void *pointer
     ) const noexcept {
-        bind();
-        vbo.bind();
+        assert(m_id != 0);
 
         glVertexAttribLPointer(idx, size, type, stride, pointer);
         glEnableVertexAttribArray(idx);
     }
 
     void vertex_array::set_element_buffer(const element_buffer &ebo) const noexcept {
-        GLint prev_vao = 0;
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prev_vao);
+        assert(m_id != 0);
+        assert(ebo.id() != 0);
 
-        glBindVertexArray(m_id);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.id());
-
-        glBindVertexArray(prev_vao);
     }
 
     constexpr const char *vertex_array::err_to_str(error e) noexcept {
         switch (e) {
-            case error::gl_gen_failed: return "glGenVertexArrays() failed";
+            case error::gl_gen_buffers_failed: return "glGenVertexArrays() failed";
             default: return "unknown vertex_array_error";
         }
     }

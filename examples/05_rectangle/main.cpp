@@ -12,8 +12,8 @@ static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
 static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
 
 struct vertex {
-    sgl::gl_float pos[3];
-    sgl::color color;
+    sgl::gl_float pos[3]{};
+    sgl::color color{};
 };
 
 int main() {
@@ -21,10 +21,10 @@ int main() {
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {{0.5f, 0.5f, 0.0f}, sgl::colors::red},
-            {{0.5f, -0.5f, 0.0f}, sgl::colors::green},
-            {{-0.5f, -0.5f, 0.0f}, sgl::colors::blue},
-            {{-0.5f, 0.5f, 0.0f}, sgl::colors::magenta},
+            {.pos = {0.5f, 0.5f, 0.0f}, .color = sgl::colors::red},
+            {.pos = {0.5f, -0.5f, 0.0f}, .color = sgl::colors::green},
+            {.pos = {-0.5f, -0.5f, 0.0f}, .color = sgl::colors::blue},
+            {.pos = {-0.5f, 0.5f, 0.0f}, .color = sgl::colors::magenta},
         }
     };
 
@@ -35,7 +35,7 @@ int main() {
         }
     };
 
-    auto vao = sgl::vertex_array::create_or_panic();
+    const auto vao = sgl::vertex_array::create_or_panic();
 
     const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
@@ -43,15 +43,23 @@ int main() {
         indices.data(), sizeof(indices),GL_UNSIGNED_SHORT,GL_STATIC_DRAW
     );
 
+    vao.bind();
+    vbo.bind();
+
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+        0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
+
+    ebo.bind();
 
     vao.set_element_buffer(ebo);
+
+    sgl::vertex_buffer::unbind();
+    sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 

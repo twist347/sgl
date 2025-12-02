@@ -4,11 +4,10 @@
 #include "sgl_type.h"
 
 namespace sgl {
-    class vertex_buffer;
     class element_buffer;
 
     enum class vertex_array_error {
-        gl_gen_failed = 0,
+        gl_gen_buffers_failed = 0,
         count
     };
 
@@ -50,31 +49,15 @@ namespace sgl {
         static void disable_attrib(gl_uint idx) noexcept;
 
         void attrib_pointer(
-            const vertex_buffer &vbo,
-            gl_uint idx,
-            gl_int size,
-            gl_enum type,
-            gl_boolean normalized,
-            gl_sizei stride,
-            const void *pointer
+            gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
         ) const noexcept;
 
         void attrib_pointer_i(
-            const vertex_buffer &vbo,
-            gl_uint idx,
-            gl_int size,
-            gl_enum type,
-            gl_sizei stride,
-            const void *pointer
+            gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
 
         void attrib_pointer_l(
-            const vertex_buffer &vbo,
-            gl_uint idx,
-            gl_int size,
-            gl_enum type,
-            gl_sizei stride,
-            const void *pointer
+            gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
 
         void set_element_buffer(const element_buffer &ebo) const noexcept;

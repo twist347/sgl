@@ -7,10 +7,44 @@
 
 namespace sgl {
     enum class texture_error {
-        INVALID_PARAMS = 0,
-        STBI_LOAD_FAILED,
-        GL_GEN_FAILED,
-        COUNT
+        invalid_params = 0,
+        stbi_load_failed,
+        gl_gen_failed,
+        count
+    };
+
+    enum class texture_wrap {
+        repeat,
+        mirrored_repeat,
+        clamp_to_edge,
+        clamp_to_border,
+    };
+
+    enum class texture_min_filter {
+        nearest,
+        linear,
+        nearest_mipmap_nearest,
+        linear_mipmap_nearest,
+        nearest_mipmap_linear,
+        linear_mipmap_linear,
+    };
+
+    enum class texture_mag_filter {
+        nearest,
+        linear,
+    };
+
+    struct texture_2d_params {
+        texture_wrap wrap_s = texture_wrap::repeat;
+        texture_wrap wrap_t = texture_wrap::repeat;
+
+        texture_min_filter min_filter = texture_min_filter::linear_mipmap_linear;
+        texture_mag_filter mag_filter = texture_mag_filter::linear;
+
+        bool generate_mipmaps = true;
+        bool flip_vertically_on_load = true;
+
+        bool srgb = false;
     };
 
     class texture_2d {
@@ -38,6 +72,12 @@ namespace sgl {
             return create_from_file(path.c_str());
         }
 
+        static result create_from_file(const char *path, const texture_2d_params &params) noexcept;
+
+        static result create_from_file(const std::string &path, const texture_2d_params &params) noexcept {
+            return create_from_file(path.c_str(), params);
+        }
+
         // or panic wrappers
 
         static texture_2d create_from_file_or_panic(const char *path) noexcept;
@@ -60,11 +100,11 @@ namespace sgl {
         [[nodiscard]] gl_enum internal_format() const noexcept { return m_internal_format; }
         [[nodiscard]] gl_enum format() const noexcept { return m_format; }
 
-        static const char *err_to_str(error e) noexcept;
+        constexpr static const char *err_to_str(error e) noexcept;
 
     private:
         explicit texture_2d(gl_uint id, gl_int w, gl_int h, gl_enum internal_format, gl_enum format) noexcept
-            : m_id(id), m_width(w), m_height(h), m_internal_format(internal_format), m_format(format) {
+            : m_id{id}, m_width{w}, m_height{h}, m_internal_format{internal_format}, m_format{format} {
         }
 
         void destroy() noexcept;

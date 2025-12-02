@@ -6,7 +6,7 @@
 namespace sgl {
     enum class element_buffer_error {
         invalid_params = 0,
-        gl_gen_failed,
+        gl_gen_buffers_failed,
         gl_alloc_failed,
         count
     };

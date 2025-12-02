@@ -42,7 +42,7 @@ namespace sgl {
 
         static void unbind() noexcept;
 
-        void set_data(const void *data, gl_sizeiptr size) noexcept;
+        void set_data(const void *data, gl_sizeiptr size) const noexcept;
 
         [[nodiscard]] gl_uint get_id() const noexcept { return m_id; }
         [[nodiscard]] gl_sizeiptr get_size() const noexcept { return m_size; }

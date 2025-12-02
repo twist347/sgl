@@ -1,7 +1,6 @@
 #include "internal/sgl_shader.h"
 
 #include <cassert>
-#include <fstream>
 #include <string>
 #include <utility>
 
@@ -9,11 +8,12 @@
 
 #include "internal/sgl_log.h"
 #include "internal/sgl_io.h"
+#include "internal/sgl_util.h"
 
 namespace sgl {
     // ctors and assignments
 
-    shader::shader(shader &&other) noexcept : m_program(std::exchange(other.m_program, 0)) {
+    shader::shader(shader &&other) noexcept : m_program{std::exchange(other.m_program, 0)} {
     }
 
     shader &shader::operator=(shader &&other) noexcept {
@@ -36,10 +36,14 @@ namespace sgl {
 
     shader::result shader::create_from_ids(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
         if (!vertex_shader || !fragment_shader) {
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
         const gl_uint program = glCreateProgram();
+        if (!program) {
+            SGL_LOG_ERROR("glCreateProgram() failed");
+            return unexpected{error::gl_create_program_failed};
+        }
 
         glAttachShader(program, vertex_shader);
         glAttachShader(program, fragment_shader);
@@ -50,7 +54,7 @@ namespace sgl {
 
         if (!check_link(program)) {
             glDeleteProgram(program);
-            return unexpected{error::PROGRAM_LINK_FAILED};
+            return unexpected{error::gl_program_link_failed};
         }
 
         return shader{program};
@@ -58,10 +62,10 @@ namespace sgl {
 
     shader::result shader::create_from_source(const char *vertex_src, const char *fragment_src) noexcept {
         if (!vertex_src || !fragment_src) {
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
-        auto err = error::INVALID_PARAMS;
+        auto err = error::invalid_params;
 
         const gl_uint vs = compile_shader(GL_VERTEX_SHADER, vertex_src, err);
         if (vs == 0) {
@@ -84,7 +88,7 @@ namespace sgl {
 
     shader::result shader::create_from_files(const char *vertex_path, const char *fragment_path) noexcept {
         if (!vertex_path || !fragment_path) {
-            return unexpected{error::INVALID_PARAMS};
+            return unexpected{error::invalid_params};
         }
 
         std::string vs_src;
@@ -92,12 +96,12 @@ namespace sgl {
 
         if (!detail::read_text_file(vertex_path, vs_src)) {
             SGL_LOG_ERROR("failed to read vertex shader file: %s", vertex_path);
-            return unexpected{error::FILE_IO_FAILED};
+            return unexpected{error::file_io_failed};
         }
 
         if (!detail::read_text_file(fragment_path, fs_src)) {
             SGL_LOG_ERROR("failed to read fragment shader file: %s", fragment_path);
-            return unexpected{error::FILE_IO_FAILED};
+            return unexpected{error::file_io_failed};
         }
 
         return create_from_source(vs_src, fs_src);
@@ -150,7 +154,7 @@ namespace sgl {
     }
 
     void shader::set_uniform(gl_int loc, const void *value, shader_uniform_type type, gl_sizei count) const noexcept {
-        set_uniform_impl(m_program, loc, value, type, count);
+        set_uniform_impl(loc, value, type, count);
     }
 
     void shader::set_uniform(
@@ -169,36 +173,36 @@ namespace sgl {
             return;
         }
 
-        set_uniform_impl(m_program, loc, value, type, count);
+        set_uniform_impl(loc, value, type, count);
     }
 
-    const char *shader::err_to_str(error err) noexcept {
+    constexpr const char *shader::err_to_str(error err) noexcept {
         switch (err) {
-            case error::INVALID_PARAMS: return "invalid params";
-            case error::FILE_IO_FAILED: return "file I/O failed";
-            case error::VERTEX_COMPILE_FAILED: return "vertex shader compile failed";
-            case error::FRAGMENT_COMPILE_FAILED: return "fragment shader compile failed";
-            case error::PROGRAM_LINK_FAILED: return "shader program link failed";
-            default: return "unknown shader_error_e";
+            case error::invalid_params: return "invalid params";
+            case error::file_io_failed: return "file I/O failed";
+            case error::gl_vertex_compile_failed: return "vertex shader compile failed";
+            case error::gl_fragment_compile_failed: return "fragment shader compile failed";
+            case error::gl_program_link_failed: return "shader program link failed";
+            default: return "unknown shader_error";
         }
     }
 
     // internal
 
     gl_uint shader::compile_shader(gl_enum type, const char *src, error &out_err) noexcept {
-        assert(src);
+        SGL_VERIFY(src);
 
         const gl_uint shader = glCreateShader(type);
         if (!shader) {
             SGL_LOG_ERROR("glCreateShader() failed");
-            out_err = error::VERTEX_COMPILE_FAILED;
+            out_err = error::gl_create_shader_failed;
             return 0;
         }
 
         glShaderSource(shader, 1, &src, nullptr);
         glCompileShader(shader);
 
-        const char *type_name = "SHADER";
+        auto type_name = "SHADER";
         switch (type) {
             case GL_VERTEX_SHADER: type_name = "VERTEX";
                 break;
@@ -215,9 +219,9 @@ namespace sgl {
             glDeleteShader(shader);
 
             if (type == GL_VERTEX_SHADER) {
-                out_err = error::VERTEX_COMPILE_FAILED;
+                out_err = error::gl_vertex_compile_failed;
             } else if (type == GL_FRAGMENT_SHADER) {
-                out_err = error::FRAGMENT_COMPILE_FAILED;
+                out_err = error::gl_fragment_compile_failed;
             }
 
             return 0;
@@ -275,7 +279,6 @@ namespace sgl {
     }
 
     void shader::set_uniform_impl(
-        gl_uint program,
         gl_int loc,
         const void *value,
         shader_uniform_type type,
@@ -290,8 +293,6 @@ namespace sgl {
             SGL_LOG_WARN("uniform value is null");
             return;
         }
-
-        glUseProgram(program);
 
         switch (type) {
             case shader_uniform_type::INT:
@@ -341,6 +342,8 @@ namespace sgl {
                 break;
             case shader_uniform_type::MAT4:
                 glUniformMatrix4fv(loc, count, GL_FALSE, static_cast<const gl_float *>(value));
+                break;
+            default:
                 break;
         }
     }

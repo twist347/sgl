@@ -17,8 +17,8 @@ constexpr std::size_t VERT_COUNT = NUM_SEGMENTS + 2;
 constexpr float RADIUS = 0.5f;
 
 struct vertex {
-    sgl::gl_float pos[3];
-    sgl::color color;
+    sgl::gl_float pos[3]{};
+    sgl::color color{};
 };
 
 void init_vertices(std::array<vertex, VERT_COUNT> &vertices);
@@ -34,13 +34,19 @@ int main() {
 
     const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
+    vao.bind();
+    vbo.bind();
+
     vao.attrib_pointer(
-        vbo, 0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+        0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
     vao.attrib_pointer(
-        vbo, 1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
+
+    sgl::vertex_buffer::unbind();
+    sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
