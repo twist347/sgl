@@ -24,6 +24,7 @@ namespace sgl {
         destroy();
 
         m_program = std::exchange(other.m_program, 0);
+        m_uniform_cache = {};
 
         return *this;
     }
@@ -150,30 +151,205 @@ namespace sgl {
         if (!m_program || !name) {
             return -1;
         }
-        return glGetUniformLocation(m_program, name);
-    }
 
-    void shader::set_uniform(gl_int loc, const void *value, shader_uniform_type type, gl_sizei count) const noexcept {
-        set_uniform_impl(loc, value, type, count);
-    }
-
-    void shader::set_uniform(
-        const char *name,
-        const void *value,
-        shader_uniform_type type,
-        gl_sizei count
-    ) const noexcept {
-        if (!m_program || !name) {
-            return;
+        if (const auto it = m_uniform_cache.find(name); it != m_uniform_cache.end()) {
+            return it->second;
         }
 
         const gl_int loc = glGetUniformLocation(m_program, name);
-        if (loc < 0) {
-            SGL_LOG_WARN("uniform '%s' not found", name);
-            return;
+        if (loc >= 0) {
+            m_uniform_cache.emplace(name, loc);
         }
 
-        set_uniform_impl(loc, value, type, count);
+        return loc;
+    }
+
+    // scalars
+
+    bool shader::set_uniform(gl_int loc, gl_int v) const noexcept {
+        if (!validate_uniform_loc(loc)) {
+            return false;
+        }
+        glUniform1i(loc, v);
+        return true;
+    }
+
+    bool shader::set_uniform(gl_int loc, gl_uint v) const noexcept {
+        if (!validate_uniform_loc(loc)) {
+            return false;
+        }
+        glUniform1ui(loc, v);
+        return true;
+    }
+
+    bool shader::set_uniform(gl_int loc, gl_float v) const noexcept {
+        if (!validate_uniform_loc(loc)) {
+            return false;
+        }
+        glUniform1f(loc, v);
+        return true;
+    }
+
+    // vecs
+
+    bool shader::set_uniform_vec2(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        if (!validate_uniform_loc(loc) || !v) {
+            return false;
+        }
+        glUniform2fv(loc, count, v);
+        return true;
+    }
+
+    bool shader::set_uniform_vec3(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        if (!validate_uniform_loc(loc) || !v) {
+            return false;
+        }
+        glUniform3fv(loc, count, v);
+        return true;
+    }
+
+    bool shader::set_uniform_vec4(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        if (!validate_uniform_loc(loc) || !v) {
+            return false;
+        }
+        glUniform4fv(loc, count, v);
+        return true;
+    }
+
+    // mats (column major)
+
+    bool shader::set_uniform_mat3(gl_int loc, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        if (!validate_uniform_loc(loc) || !m) {
+            return false;
+        }
+        glUniformMatrix3fv(loc, count, transpose, m);
+        return true;
+    }
+
+    bool shader::set_uniform_mat4(gl_int loc, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        if (!validate_uniform_loc(loc) || !m) {
+            return false;
+        }
+        glUniformMatrix4fv(loc, count, transpose, m);
+        return true;
+    }
+
+    // scalars
+
+    bool shader::set_uniform(const char *name, gl_int v) const noexcept {
+        if (!name) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform(loc, v);
+    }
+
+    bool shader::set_uniform(const char *name, gl_uint v) const noexcept {
+        if (!name) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform(loc, v);
+    }
+
+    bool shader::set_uniform(const char *name, gl_float v) const noexcept {
+        if (!name) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform(loc, v);
+    }
+
+    // vecs
+
+    bool shader::set_uniform_vec2(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        if (!name || !v) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform_vec2(loc, v, count);
+    }
+
+    bool shader::set_uniform_vec3(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        if (!name || !v) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform_vec3(loc, v, count);
+    }
+
+    bool shader::set_uniform_vec4(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        if (!name || !v) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform_vec4(loc, v, count);
+    }
+
+    // mats (column major)
+
+    bool shader::set_uniform_mat3(const char *name, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        if (!name || !m) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform_mat3(loc, m, transpose, count);
+    }
+
+    bool shader::set_uniform_mat4(const char *name, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        if (!name || !m) {
+            return false;
+        }
+
+        const gl_int loc = uniform_location(name);
+        if (loc < 0) {
+            SGL_LOG_ERROR("uniform '%s' not found", name);
+            return false;
+        }
+
+        return set_uniform_mat4(loc, m, transpose, count);
     }
 
     constexpr const char *shader::err_to_str(error err) noexcept {
@@ -183,6 +359,8 @@ namespace sgl {
             case error::gl_vertex_compile_failed: return "vertex shader compile failed";
             case error::gl_fragment_compile_failed: return "fragment shader compile failed";
             case error::gl_program_link_failed: return "shader program link failed";
+            case error::gl_create_shader_failed: return "glCreateShader() failed";
+            case error::gl_create_program_failed: return "glCreateProgram() failed";
             default: return "unknown shader_error";
         }
     }
@@ -278,80 +456,31 @@ namespace sgl {
         return false;
     }
 
-    void shader::set_uniform_impl(
-        gl_int loc,
-        const void *value,
-        shader_uniform_type type,
-        gl_sizei count
-    ) noexcept {
-        if (loc < 0) {
-            SGL_LOG_WARN("uniform location < 0");
-            return;
-        }
-
-        if (!value) {
-            SGL_LOG_WARN("uniform value is null");
-            return;
-        }
-
-        switch (type) {
-            case shader_uniform_type::INT:
-                glUniform1iv(loc, count, static_cast<const gl_int *>(value));
-                break;
-            case shader_uniform_type::INT_VEC2:
-                glUniform2iv(loc, count, static_cast<const gl_int *>(value));
-                break;
-            case shader_uniform_type::INT_VEC3:
-                glUniform3iv(loc, count, static_cast<const gl_int *>(value));
-                break;
-            case shader_uniform_type::INT_VEC4:
-                glUniform4iv(loc, count, static_cast<const gl_int *>(value));
-                break;
-
-            case shader_uniform_type::UINT:
-                glUniform1uiv(loc, count, static_cast<const gl_uint *>(value));
-                break;
-            case shader_uniform_type::UINT_VEC2:
-                glUniform2uiv(loc, count, static_cast<const gl_uint *>(value));
-                break;
-            case shader_uniform_type::UINT_VEC3:
-                glUniform3uiv(loc, count, static_cast<const gl_uint *>(value));
-                break;
-            case shader_uniform_type::UINT_VEC4:
-                glUniform4uiv(loc, count, static_cast<const gl_uint *>(value));
-                break;
-
-            case shader_uniform_type::FLOAT:
-                glUniform1fv(loc, count, static_cast<const gl_float *>(value));
-                break;
-            case shader_uniform_type::VEC2:
-                glUniform2fv(loc, count, static_cast<const gl_float *>(value));
-                break;
-            case shader_uniform_type::VEC3:
-                glUniform3fv(loc, count, static_cast<const gl_float *>(value));
-                break;
-            case shader_uniform_type::VEC4:
-                glUniform4fv(loc, count, static_cast<const gl_float *>(value));
-                break;
-
-            case shader_uniform_type::MAT2:
-                glUniformMatrix2fv(loc, count, GL_FALSE, static_cast<const gl_float *>(value));
-                break;
-            case shader_uniform_type::MAT3:
-                glUniformMatrix3fv(loc, count, GL_FALSE, static_cast<const gl_float *>(value));
-                break;
-            case shader_uniform_type::MAT4:
-                glUniformMatrix4fv(loc, count, GL_FALSE, static_cast<const gl_float *>(value));
-                break;
-            default:
-                break;
-        }
-    }
-
     void shader::destroy() noexcept {
         if (m_program != 0) {
             glDeleteProgram(m_program);
             m_program = 0;
         }
+    }
+
+    bool shader::validate_uniform_loc(gl_int loc) const noexcept {
+        if (loc < 0) {
+            SGL_LOG_ERROR("shader::set_uniform: location < 0");
+            return false;
+        }
+
+        if (!is_valid()) {
+            SGL_LOG_ERROR("shader::set_uniform: called on invalid program");
+            return false;
+        }
+
+        GLint current = 0;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &current);
+        if (static_cast<gl_uint>(current) != m_program) {
+            SGL_LOG_ERROR("shader::set_uniform: this program is not currently in use");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -111,13 +111,6 @@ namespace sgl {
         glEnableVertexAttribArray(idx);
     }
 
-    void vertex_array::set_element_buffer(const element_buffer &ebo) const noexcept {
-        assert(m_id != 0);
-        assert(ebo.id() != 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.id());
-    }
-
     constexpr const char *vertex_array::err_to_str(error e) noexcept {
         switch (e) {
             case error::gl_gen_buffers_failed: return "glGenVertexArrays() failed";

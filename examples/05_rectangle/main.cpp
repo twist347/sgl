@@ -21,10 +21,10 @@ int main() {
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {.pos = {0.5f, 0.5f, 0.0f}, .color = sgl::colors::red},
-            {.pos = {0.5f, -0.5f, 0.0f}, .color = sgl::colors::green},
-            {.pos = {-0.5f, -0.5f, 0.0f}, .color = sgl::colors::blue},
-            {.pos = {-0.5f, 0.5f, 0.0f}, .color = sgl::colors::magenta},
+            {.pos = {0.5f, 0.5f, 0.f}, .color = sgl::colors::red},
+            {.pos = {0.5f, -0.5f, 0.f}, .color = sgl::colors::green},
+            {.pos = {-0.5f, -0.5f, 0.f}, .color = sgl::colors::blue},
+            {.pos = {-0.5f, 0.5f, 0.f}, .color = sgl::colors::magenta},
         }
     };
 
@@ -55,8 +55,6 @@ int main() {
     );
 
     ebo.bind();
-
-    vao.set_element_buffer(ebo);
 
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();

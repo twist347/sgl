@@ -25,10 +25,10 @@ int main() {
 
     constexpr std::array<vertex, 4> vertices = {
         {
-            {.pos = {0.5f, 0.5f, 0.0f}, .color = sgl::colors::red, .tex = {1.0f, 1.0f}}, // right top
-            {.pos = {0.5f, -0.5f, 0.0f}, .color = sgl::colors::green, .tex = {1.0f, 0.0f}}, // right bottom
-            {.pos = {-0.5f, -0.5f, 0.0f}, .color = sgl::colors::blue, .tex = {0.0f, 0.0f}}, // left bottom
-            {.pos = {-0.5f, 0.5f, 0.0f}, .color = sgl::colors::magenta, .tex = {0.0f, 1.0f}}, // left top
+            {.pos = {0.5f, 0.5f, 0.f}, .color = sgl::colors::red, .tex = {1.f, 1.f}}, // right top
+            {.pos = {0.5f, -0.5f, 0.f}, .color = sgl::colors::green, .tex = {1.f, 0.f}}, // right bottom
+            {.pos = {-0.5f, -0.5f, 0.f}, .color = sgl::colors::blue, .tex = {0.f, 0.f}}, // left bottom
+            {.pos = {-0.5f, 0.5f, 0.f}, .color = sgl::colors::magenta, .tex = {0.f, 1.f}}, // left top
         }
     };
 
@@ -64,16 +64,16 @@ int main() {
 
     ebo.bind();
 
-    vao.set_element_buffer(ebo);
-
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    constexpr sgl::gl_int v0 = 0;
     shader.use();
-    shader.set_uniform("tex0", &v0, sgl::shader_uniform_type::INT);
+    constexpr sgl::gl_int v0 = 0;
+    SGL_VERIFY(shader.set_uniform("u_tex0", v0));
+
+    texture.bind(v0);
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
@@ -81,9 +81,8 @@ int main() {
         sgl::render::clear_color_buffer();
 
         shader.use();
-        texture.bind(v0);
         vao.bind();
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<sgl::gl_sizei>(indices.size()), GL_UNSIGNED_SHORT, nullptr);
 
         window.swap_buffers();
         sgl::window::poll_events();

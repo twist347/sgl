@@ -4,8 +4,6 @@
 #include "sgl_type.h"
 
 namespace sgl {
-    class element_buffer;
-
     enum class vertex_array_error {
         gl_gen_buffers_failed = 0,
         count
@@ -59,8 +57,6 @@ namespace sgl {
         void attrib_pointer_l(
             gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
-
-        void set_element_buffer(const element_buffer &ebo) const noexcept;
 
         constexpr static const char *err_to_str(error e) noexcept;
 

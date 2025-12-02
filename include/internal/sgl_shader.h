@@ -1,34 +1,12 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include "sgl_type.h"
 #include "sgl_expected.h"
 
 namespace sgl {
-    enum class shader_uniform_type {
-        INT = 0,
-        INT_VEC2,
-        INT_VEC3,
-        INT_VEC4,
-
-        UINT,
-        UINT_VEC2,
-        UINT_VEC3,
-        UINT_VEC4,
-
-        FLOAT,
-        VEC2,
-        VEC3,
-        VEC4,
-
-        MAT2,
-        MAT3,
-        MAT4,
-
-        COUNT
-    };
-
     enum class shader_error {
         invalid_params = 0,
         file_io_failed,
@@ -80,8 +58,7 @@ namespace sgl {
         static shader create_from_source_or_panic(const char *vertex_src, const char *fragment_src) noexcept;
 
         static shader create_from_source_or_panic(
-            const std::string &vertex_src,
-            const std::string &fragment_src
+            const std::string &vertex_src, const std::string &fragment_src
         ) noexcept {
             return create_from_source_or_panic(vertex_src.c_str(), fragment_src.c_str());
         }
@@ -89,8 +66,7 @@ namespace sgl {
         static shader create_from_files_or_panic(const char *vertex_path, const char *fragment_path) noexcept;
 
         static shader create_from_files_or_panic(
-            const std::string &vertex_path,
-            const std::string &fragment_path
+            const std::string &vertex_path, const std::string &fragment_path
         ) noexcept {
             return create_from_files_or_panic(vertex_path.c_str(), fragment_path.c_str());
         }
@@ -104,14 +80,43 @@ namespace sgl {
 
         [[nodiscard]] gl_int uniform_location(const char *name) const noexcept;
 
-        void set_uniform(gl_int loc, const void *value, shader_uniform_type type, gl_sizei count = 1) const noexcept;
+        [[nodiscard]] gl_int uniform_location(const std::string &name) const noexcept {
+            return uniform_location(name.c_str());
+        }
 
-        void set_uniform(
-            const char *name,
-            const void *value,
-            shader_uniform_type type,
-            gl_sizei count = 1
-        ) const noexcept;
+        // scalars
+
+        bool set_uniform(gl_int loc, gl_int v) const noexcept;
+        bool set_uniform(gl_int loc, gl_uint v) const noexcept;
+        bool set_uniform(gl_int loc, gl_float v) const noexcept;
+
+        // vecs
+
+        bool set_uniform_vec2(gl_int loc, const gl_float *v, gl_sizei count = 1) const noexcept;
+        bool set_uniform_vec3(gl_int loc, const gl_float *v, gl_sizei count = 1) const noexcept;
+        bool set_uniform_vec4(gl_int loc, const gl_float *v, gl_sizei count = 1) const noexcept;
+
+        // mats (column major)
+
+        bool set_uniform_mat3(gl_int loc, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
+        bool set_uniform_mat4(gl_int loc, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
+
+        // scalars
+
+        bool set_uniform(const char *name, gl_int v) const noexcept;
+        bool set_uniform(const char *name, gl_uint v) const noexcept;
+        bool set_uniform(const char *name, gl_float v) const noexcept;
+
+        // vecs
+
+        bool set_uniform_vec2(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
+        bool set_uniform_vec3(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
+        bool set_uniform_vec4(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
+
+        // mats (column major)
+
+        bool set_uniform_mat3(const char *name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
+        bool set_uniform_mat4(const char *name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
 
         constexpr static const char *err_to_str(error err) noexcept;
 
@@ -122,19 +127,15 @@ namespace sgl {
 
         static bool check_link(gl_uint program) noexcept;
 
-        static void set_uniform_impl(
-            gl_int loc,
-            const void *value,
-            shader_uniform_type type,
-            gl_sizei count
-        ) noexcept;
-
     private:
         explicit shader(gl_uint program) noexcept : m_program{program} {
         }
 
         void destroy() noexcept;
 
+        [[nodiscard]] bool validate_uniform_loc(gl_int loc) const noexcept;
+
         gl_uint m_program = 0;
+        mutable std::unordered_map<std::string, gl_int> m_uniform_cache;
     };
 }
