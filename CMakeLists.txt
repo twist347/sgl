@@ -36,6 +36,7 @@ add_library(
         src/sgl_backend.cpp
         src/sgl_io.cpp
         src/sgl_texture.cpp
+        src/sgl_time.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)

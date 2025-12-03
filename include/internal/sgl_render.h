@@ -8,4 +8,6 @@ namespace sgl::render {
     void set_clear_color(const color &c) noexcept;
 
     void clear_color_buffer() noexcept;
+
+    void clear_color_depth_buffer() noexcept;
 }

@@ -15,3 +15,4 @@
 #include "internal/sgl_vertex_array.h"
 #include "internal/sgl_math.h"
 #include "internal/sgl_texture.h"
+#include "internal/sgl_time.h"

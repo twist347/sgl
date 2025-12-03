@@ -1,10 +1,6 @@
 #include "internal/sgl_render.h"
 
 #include "glad/glad.h"
-#include "internal/sgl_element_buffer.h"
-
-#include "internal/sgl_vertex_array.h"
-#include "internal/sgl_shader.h"
 
 namespace sgl::render {
     namespace detail {
@@ -26,5 +22,9 @@ namespace sgl::render {
 
     void clear_color_buffer() noexcept {
         glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void clear_color_depth_buffer() noexcept {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 }

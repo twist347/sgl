@@ -147,7 +147,7 @@ namespace sgl {
         glUseProgram(m_program);
     }
 
-    gl_int shader::uniform_location(const char *name) const noexcept {
+    gl_int shader::get_uniform_loc(const char *name) const noexcept {
         if (!m_program || !name) {
             return -1;
         }
@@ -241,7 +241,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -255,7 +255,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -269,7 +269,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -285,7 +285,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -299,7 +299,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -313,7 +313,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -329,7 +329,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;
@@ -343,7 +343,7 @@ namespace sgl {
             return false;
         }
 
-        const gl_int loc = uniform_location(name);
+        const gl_int loc = get_uniform_loc(name);
         if (loc < 0) {
             SGL_LOG_ERROR("uniform '%s' not found", name);
             return false;

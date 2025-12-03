@@ -56,7 +56,7 @@ int main() {
         shader.use();
         vao.bind();
 
-        glDrawArrays(GL_LINES, 0, 2);
+        glDrawArrays(GL_LINES, 0, vertices.size());
 
         sgl::vertex_array::unbind();
 
