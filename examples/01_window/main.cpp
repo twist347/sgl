@@ -10,6 +10,7 @@ static constexpr auto SCREEN_TITLE = __FILE__;
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    window.set_vsync(true);
 
     sgl::render::set_clear_color(sgl::colors::gray);
 

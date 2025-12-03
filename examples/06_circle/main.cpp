@@ -29,6 +29,7 @@ void init_vertices(std::array<vertex, VERT_COUNT> &vertices);
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    window.set_vsync(true);
 
     std::array<vertex, VERT_COUNT> vertices{};
 

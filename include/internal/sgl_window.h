@@ -35,18 +35,18 @@ namespace sgl {
 
         // fabrics
 
-        static result create(int width, int height, const char *title) noexcept;
+        static result create(int width, int height, const char *title, bool show_fps = true) noexcept;
 
-        static result create(int width, int height, const std::string &title) noexcept {
-            return create(width, height, title.c_str());
+        static result create(int width, int height, const std::string &title, bool show_fps = true) noexcept {
+            return create(width, height, title.c_str(), show_fps);
         }
 
         // or panic wrappers
 
-        static window create_or_panic(int width, int height, const char *title) noexcept;
+        static window create_or_panic(int width, int height, const char *title, bool show_fps = true) noexcept;
 
-        static window create_or_panic(int width, int height, const std::string &title) noexcept {
-            return create_or_panic(width, height, title.c_str());
+        static window create_or_panic(int width, int height, const std::string &title, bool show_fps = true) noexcept {
+            return create_or_panic(width, height, title.c_str(), show_fps);
         }
 
         // api
@@ -68,9 +68,6 @@ namespace sgl {
         constexpr static const char *err_to_str(error err) noexcept;
 
     private:
-        explicit window(GLFWwindow *handle) noexcept : m_window{handle} {
-        }
-
         static void framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept;
 
         static void key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept;
@@ -80,6 +77,23 @@ namespace sgl {
         static int s_window_count;
 
     private:
+        struct fps_state {
+            bool enabled = false;
+            double last_time = 0.0;
+            int frames = 0;
+            double interval_sec = 1.0;
+            double cur_fps = 0.0;
+            std::string base_title;
+        };
+
+        mutable fps_state m_fps_state;
+
+        void count_fps() const noexcept;
+
+    private:
+        explicit window(GLFWwindow *handle) noexcept : m_window{handle} {
+        }
+
         void destroy_window() noexcept;
 
         GLFWwindow *m_window = nullptr;

@@ -1,6 +1,7 @@
 #include "internal/sgl_window.h"
 
 #include <utility>
+#include <cstdio>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -9,13 +10,15 @@
 #include "internal/sgl_util.h"
 #include "internal/sgl_info.h"
 #include "internal/sgl_backend.h"
+#include "internal/sgl_time.h"
 
 namespace sgl {
     int window::s_window_count = 0;
 
     // ctors
 
-    window::window(window &&other) noexcept : m_window{std::exchange(other.m_window, nullptr)} {
+    window::window(window &&other) noexcept : m_fps_state{std::move(other.m_fps_state)},
+                                              m_window{std::exchange(other.m_window, nullptr)} {
     }
 
     window &window::operator=(window &&other) noexcept {
@@ -25,6 +28,7 @@ namespace sgl {
 
         destroy_window();
 
+        m_fps_state = std::move(other.m_fps_state);
         m_window = std::exchange(other.m_window, nullptr);
 
         return *this;
@@ -36,7 +40,7 @@ namespace sgl {
 
     // fabrics
 
-    window::result window::create(int width, int height, const char *title) noexcept {
+    window::result window::create(int width, int height, const char *title, bool show_fps) noexcept {
         if (width <= 0 || height <= 0 || !title) {
             return unexpected{error::invalid_params};
         }
@@ -78,13 +82,21 @@ namespace sgl {
             detail::print_info();
         }
 
-        return window{handle};
+        auto w = window{handle};
+
+        if (show_fps) {
+            w.m_fps_state.enabled = true;
+            w.m_fps_state.last_time = get_time();
+            w.m_fps_state.base_title = title;
+        }
+
+        return w;
     }
 
     // or panic wrappers
 
-    window window::create_or_panic(int width, int height, const char *title) noexcept {
-        auto res = create(width, height, title);
+    window window::create_or_panic(int width, int height, const char *title, bool show_fps) noexcept {
+        auto res = create(width, height, title, show_fps);
         if (!res) {
             SGL_LOG_FATAL("failed to create window: %s", err_to_str(res.error()));
         }
@@ -116,6 +128,10 @@ namespace sgl {
 
     void window::swap_buffers() const noexcept {
         glfwSwapBuffers(m_window);
+
+        if (m_fps_state.enabled) {
+            count_fps();
+        }
     }
 
     int window::width() const noexcept {
@@ -163,6 +179,25 @@ namespace sgl {
         int fbw = 0, fbh = 0;
         glfwGetFramebufferSize(handle, &fbw, &fbh);
         glViewport(0, 0, fbw, fbh);
+    }
+
+    void window::count_fps() const noexcept {
+        const double now = get_time();
+        ++m_fps_state.frames;
+
+        if (const auto dt = now - m_fps_state.last_time; dt >= m_fps_state.interval_sec && dt > 0.0) {
+            m_fps_state.cur_fps = static_cast<double>(m_fps_state.frames) / dt;
+            m_fps_state.frames = 0;
+            m_fps_state.last_time = now;
+
+            char buf[128];
+            std::snprintf(
+                buf, sizeof(buf), "%s [%.0f FPS]",
+                m_fps_state.base_title.c_str(),
+                m_fps_state.cur_fps
+            );
+            glfwSetWindowTitle(m_window, buf);
+        }
     }
 
     void window::destroy_window() noexcept {

@@ -24,6 +24,7 @@ struct vertex {
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    window.set_vsync(true);
 
     const auto texture = sgl::texture_2d::create_from_file_or_panic(TEXTURE_PATH);
 

@@ -22,6 +22,7 @@ struct vertex {
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
+    window.set_vsync(true);
 
     constexpr std::array<vertex, 4> vertices = {
         {
