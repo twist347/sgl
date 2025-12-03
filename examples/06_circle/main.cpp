@@ -1,3 +1,7 @@
+/*
+draw a circle
+*/
+
 #include "sgl.h"
 
 #include <array>

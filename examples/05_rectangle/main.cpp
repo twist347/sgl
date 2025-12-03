@@ -1,3 +1,7 @@
+/*
+draw a rect
+*/
+
 #include "sgl.h"
 
 #include <array>

@@ -1,3 +1,7 @@
+/*
+draw a spinning cube
+*/
+
 #include "sgl.h"
 
 #include <array>
@@ -24,37 +28,37 @@ int main() {
 
     constexpr std::array<vertex, 24> vertices = {
         {
-            // back face (z = -0.5) - OGT_RED
+            // back face
             {.pos = {-0.5f, -0.5f, -0.5f}, .color = sgl::colors::red},
             {.pos = {0.5f, -0.5f, -0.5f}, .color = sgl::colors::red},
             {.pos = {0.5f, 0.5f, -0.5f}, .color = sgl::colors::red},
             {.pos = {-0.5f, 0.5f, -0.5f}, .color = sgl::colors::red},
 
-            // front face (z = 0.5) - OGT_GREEN
+            // front face
             {.pos = {-0.5f, -0.5f, 0.5f}, .color = sgl::colors::green},
             {.pos = {0.5f, -0.5f, 0.5f}, .color = sgl::colors::green},
             {.pos = {0.5f, 0.5f, 0.5f}, .color = sgl::colors::green},
             {.pos = {-0.5f, 0.5f, 0.5f}, .color = sgl::colors::green},
 
-            // left face (x = -0.5) - OGT_BLUE
+            // left face
             {.pos = {-0.5f, -0.5f, -0.5f}, .color = sgl::colors::blue},
             {.pos = {-0.5f, -0.5f, 0.5f}, .color = sgl::colors::blue},
             {.pos = {-0.5f, 0.5f, 0.5f}, .color = sgl::colors::blue},
             {.pos = {-0.5f, 0.5f, -0.5f}, .color = sgl::colors::blue},
 
-            // right face (x = 0.5) - OGT_YELLOW
+            // right face
             {.pos = {0.5f, -0.5f, -0.5f}, .color = sgl::colors::yellow},
             {.pos = {0.5f, -0.5f, 0.5f}, .color = sgl::colors::yellow},
             {.pos = {0.5f, 0.5f, 0.5f}, .color = sgl::colors::yellow},
             {.pos = {0.5f, 0.5f, -0.5f}, .color = sgl::colors::yellow},
 
-            // bottom face (y = -0.5) - OGT_CYAN
+            // bottom face
             {.pos = {-0.5f, -0.5f, -0.5f}, .color = sgl::colors::cyan},
             {.pos = {0.5f, -0.5f, -0.5f}, .color = sgl::colors::cyan},
             {.pos = {0.5f, -0.5f, 0.5f}, .color = sgl::colors::cyan},
             {.pos = {-0.5f, -0.5f, 0.5f}, .color = sgl::colors::cyan},
 
-            // top face (y = 0.5) - OGT_MAGENTA
+            // top face
             {.pos = {-0.5f, 0.5f, -0.5f}, .color = sgl::colors::magenta},
             {.pos = {0.5f, 0.5f, -0.5f}, .color = sgl::colors::magenta},
             {.pos = {0.5f, 0.5f, 0.5f}, .color = sgl::colors::magenta},
@@ -124,11 +128,11 @@ int main() {
         0.1f, 100.f
     );
 
-    const sgl::gl_int model_loc = shader.get_uniform_loc("u_model");
+    const auto model_loc = shader.get_uniform_loc("u_model");
 
     shader.use();
-    shader.set_uniform_mat4("u_view", glm::value_ptr(view));
-    shader.set_uniform_mat4("u_projection", glm::value_ptr(projection));
+    SGL_VERIFY(shader.set_uniform_mat4("u_view", glm::value_ptr(view)));
+    SGL_VERIFY(shader.set_uniform_mat4("u_projection", glm::value_ptr(projection)));
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
@@ -140,7 +144,7 @@ int main() {
         auto model = glm::rotate(glm::mat4(1.f), glm::radians(-45.f) * sgl::get_time_f(), glm::vec3(1.f, 1.f, 1.f));
 
         shader.use();
-        shader.set_uniform_mat4(model_loc, glm::value_ptr(model));
+        SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
         vao.bind();
         glDrawElements(GL_TRIANGLES, static_cast<sgl::gl_sizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 

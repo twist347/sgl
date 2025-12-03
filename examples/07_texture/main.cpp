@@ -1,3 +1,7 @@
+/*
+draw a rect with texture
+*/
+
 #include "sgl.h"
 
 #include <array>

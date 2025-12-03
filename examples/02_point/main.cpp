@@ -1,3 +1,7 @@
+/*
+draw a point
+*/
+
 #include "sgl.h"
 
 #include <array>

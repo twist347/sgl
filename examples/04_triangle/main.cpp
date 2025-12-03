@@ -1,3 +1,7 @@
+/*
+draw a triangle
+*/
+
 #include "sgl.h"
 
 #include <array>

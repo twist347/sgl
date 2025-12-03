@@ -1,3 +1,7 @@
+/*
+draw a line
+*/
+
 #include "sgl.h"
 
 #include <array>

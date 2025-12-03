@@ -1,3 +1,7 @@
+/*
+create window
+*/
+
 #include "sgl.h"
 
 static constexpr int SCREEN_WIDTH = 1920;
