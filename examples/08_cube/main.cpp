@@ -23,6 +23,8 @@ struct vertex {
     sgl::color color{};
 };
 
+static bool enable_depth_test = true;
+
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
     window.set_vsync(true);
@@ -137,12 +139,27 @@ int main() {
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
-    glEnable(GL_DEPTH_TEST);
+    if (enable_depth_test) {
+        glEnable(GL_DEPTH_TEST);
+    } else {
+        glDisable(GL_DEPTH_TEST);
+    }
 
     while (!window.should_close()) {
         sgl::render::clear_color_depth_buffer();
 
-        auto model = glm::rotate(glm::mat4(1.f), glm::radians(-45.f) * sgl::get_time_f(), glm::vec3(1.f, 1.f, 1.f));
+        if (sgl::input::is_key_pressed(sgl::key::d)) {
+            enable_depth_test = !enable_depth_test;
+
+            if (enable_depth_test) {
+                glEnable(GL_DEPTH_TEST);
+            } else {
+                glDisable(GL_DEPTH_TEST);
+            }
+        }
+
+        const auto angle = glm::radians(-45.f) * sgl::get_time_f();
+        auto model = glm::rotate(glm::mat4(1.f), angle, glm::vec3(1.f, 1.f, 1.f));
 
         shader.use();
         SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));

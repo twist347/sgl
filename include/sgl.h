@@ -16,3 +16,6 @@
 #include "internal/sgl_math.h"
 #include "internal/sgl_texture.h"
 #include "internal/sgl_time.h"
+#include "internal/sgl_file.h"
+#include "internal/sgl_key.h"
+#include "internal/sgl_input.h"

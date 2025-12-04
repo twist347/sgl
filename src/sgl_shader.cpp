@@ -7,7 +7,7 @@
 #include "glad/glad.h"
 
 #include "internal/sgl_log.h"
-#include "internal/sgl_io.h"
+#include "internal/sgl_file.h"
 #include "internal/sgl_util.h"
 
 namespace sgl {

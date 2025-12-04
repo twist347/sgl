@@ -11,6 +11,7 @@
 #include "internal/sgl_info.h"
 #include "internal/sgl_backend.h"
 #include "internal/sgl_time.h"
+#include "internal/sgl_input.h"
 
 namespace sgl {
     int window::s_window_count = 0;
@@ -147,6 +148,7 @@ namespace sgl {
     }
 
     void window::poll_events() noexcept {
+        sgl::detail::input::new_frame();
         glfwPollEvents();
     }
 
@@ -169,6 +171,8 @@ namespace sgl {
     void window::key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept {
         SGL_UNUSED(scancode);
         SGL_UNUSED(mods);
+
+        detail::input::on_key(key, action);
 
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
             glfwSetWindowShouldClose(handle, GLFW_TRUE);
