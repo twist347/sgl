@@ -34,7 +34,9 @@ namespace sgl {
     };
 
     enum class mouse_button {
-        left = 0,
+        unknown = 0,
+
+        left,
         right,
         middle,
 

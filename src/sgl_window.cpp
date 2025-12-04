@@ -78,6 +78,9 @@ namespace sgl {
 
         glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
         glfwSetKeyCallback(handle, key_callback);
+        glfwSetMouseButtonCallback(handle, mouse_button_callback);
+        glfwSetCursorPosCallback(handle, cursor_pos_callback);
+        glfwSetScrollCallback(handle, scroll_callback);
 
         if (s_window_count == 1) {
             detail::print_info();
@@ -162,6 +165,14 @@ namespace sgl {
         }
     }
 
+    // internal
+
+    void window::init_viewport(GLFWwindow *handle) noexcept {
+        int fbw = 0, fbh = 0;
+        glfwGetFramebufferSize(handle, &fbw, &fbh);
+        glViewport(0, 0, fbw, fbh);
+    }
+
     void window::framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept {
         SGL_UNUSED(handle);
 
@@ -179,11 +190,25 @@ namespace sgl {
         }
     }
 
-    void window::init_viewport(GLFWwindow *handle) noexcept {
-        int fbw = 0, fbh = 0;
-        glfwGetFramebufferSize(handle, &fbw, &fbh);
-        glViewport(0, 0, fbw, fbh);
+    void window::mouse_button_callback(GLFWwindow *handle, int button, int action, int mods) noexcept {
+        SGL_UNUSED(handle);
+        SGL_UNUSED(mods);
+
+        detail::input::on_mouse_button(button, action);
     }
+
+    void window::cursor_pos_callback(GLFWwindow *handle, double x_pos, double y_pos) noexcept {
+        SGL_UNUSED(handle);
+
+        detail::input::on_cursor_pos(x_pos, y_pos);
+    }
+
+    void window::scroll_callback(GLFWwindow *handle, double x_offset, double y_offset) noexcept {
+        SGL_UNUSED(handle);
+
+        detail::input::on_scroll(x_offset, y_offset);
+    }
+
 
     void window::count_fps() const noexcept {
         const double now = get_time();

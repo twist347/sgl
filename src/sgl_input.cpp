@@ -6,10 +6,23 @@
 
 namespace sgl::detail::input {
     inline constexpr int max_keys = static_cast<int>(key::count);
+    inline constexpr int max_buttons = static_cast<int>(mouse_button::count);
 
     struct state {
         bool key_down[max_keys]{};
         bool key_down_prev[max_keys]{};
+
+        bool mouse_down[max_buttons]{};
+        bool mouse_down_prev[max_buttons]{};
+
+        double mouse_x = 0.0;
+        double mouse_y = 0.0;
+
+        double mouse_dx = 0.0;
+        double mouse_dy = 0.0;
+
+        double scroll_dx = 0.0;
+        double scroll_dy = 0.0;
     };
 
     static state g_state{};
@@ -92,8 +105,55 @@ namespace sgl::detail::input {
         }
     }
 
+    static mouse_button from_glfw_mouse_button(int button) noexcept {
+        switch (button) {
+            case GLFW_MOUSE_BUTTON_LEFT: return mouse_button::left;
+            case GLFW_MOUSE_BUTTON_RIGHT: return mouse_button::right;
+            case GLFW_MOUSE_BUTTON_MIDDLE: return mouse_button::middle;
+            default: return mouse_button::unknown;
+        }
+    }
+
+    void on_mouse_button(int button, int action) noexcept {
+        const mouse_button b = from_glfw_mouse_button(button);
+        if (b == mouse_button::unknown) {
+            return;
+        }
+
+        const int idx = static_cast<int>(b);
+
+        if (action == GLFW_PRESS) {
+            g_state.mouse_down[idx] = true;
+        } else if (action == GLFW_RELEASE) {
+            g_state.mouse_down[idx] = false;
+        }
+    }
+
+    void on_cursor_pos(double x, double y) noexcept {
+        const double dx = x - g_state.mouse_x;
+        const double dy = y - g_state.mouse_y;
+
+        g_state.mouse_x = x;
+        g_state.mouse_y = y;
+
+        g_state.mouse_dx += dx;
+        g_state.mouse_dy += dy;
+    }
+
+    void on_scroll(double x_offset, double y_offset) noexcept {
+        g_state.scroll_dx += x_offset;
+        g_state.scroll_dy += y_offset;
+    }
+
+
     void new_frame() noexcept {
         std::memcpy(g_state.key_down_prev, g_state.key_down, sizeof(g_state.key_down));
+        std::memcpy(g_state.mouse_down_prev, g_state.mouse_down, sizeof(g_state.mouse_down));
+
+        g_state.mouse_dx = 0.0;
+        g_state.mouse_dy = 0.0;
+        g_state.scroll_dx = 0.0;
+        g_state.scroll_dy = 0.0;
     }
 
     static bool valid_key(key k) noexcept {
@@ -113,6 +173,40 @@ namespace sgl::detail::input {
             return false;
         }
         return g_state.key_down_prev[static_cast<int>(k)];
+    }
+
+    static bool valid_mouse_button(mouse_button b) noexcept {
+        const int idx = static_cast<int>(b);
+        return idx >= 0 && idx < max_buttons;
+    }
+
+    static bool mouse_down_impl(mouse_button b) noexcept {
+        if (!valid_mouse_button(b)) {
+            return false;
+        }
+        return g_state.mouse_down[static_cast<int>(b)];
+    }
+
+    static bool mouse_was_down_impl(mouse_button b) noexcept {
+        if (!valid_mouse_button(b)) {
+            return false;
+        }
+        return g_state.mouse_down_prev[static_cast<int>(b)];
+    }
+
+    static void mouse_position_impl(double &x, double &y) noexcept {
+        x = g_state.mouse_x;
+        y = g_state.mouse_y;
+    }
+
+    static void mouse_delta_impl(double &dx, double &dy) noexcept {
+        dx = g_state.mouse_dx;
+        dy = g_state.mouse_dy;
+    }
+
+    static void scroll_delta_impl(double &dx, double &dy) noexcept {
+        dx = g_state.scroll_dx;
+        dy = g_state.scroll_dy;
     }
 }
 
@@ -135,5 +229,37 @@ namespace sgl::input {
         const bool now = detail::input::is_down_impl(k);
         const bool prev = detail::input::was_down_impl(k);
         return !now && prev;
+    }
+
+    bool is_mouse_button_down(mouse_button b) noexcept {
+        return detail::input::mouse_down_impl(b);
+    }
+
+    bool is_mouse_button_up(mouse_button b) noexcept {
+        return !detail::input::mouse_down_impl(b);
+    }
+
+    bool is_mouse_button_pressed(mouse_button b) noexcept {
+        const bool now = detail::input::mouse_down_impl(b);
+        const bool prev = detail::input::mouse_was_down_impl(b);
+        return now && !prev;
+    }
+
+    bool is_mouse_button_released(mouse_button b) noexcept {
+        const bool now = detail::input::mouse_down_impl(b);
+        const bool prev = detail::input::mouse_was_down_impl(b);
+        return !now && prev;
+    }
+
+    void mouse_position(double &x, double &y) noexcept {
+        detail::input::mouse_position_impl(x, y);
+    }
+
+    void mouse_delta(double &dx, double &dy) noexcept {
+        detail::input::mouse_delta_impl(dx, dy);
+    }
+
+    void scroll_delta(double &dx, double &dy) noexcept {
+        detail::input::scroll_delta_impl(dx, dy);
     }
 }

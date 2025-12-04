@@ -68,11 +68,17 @@ namespace sgl {
         constexpr static const char *err_to_str(error err) noexcept;
 
     private:
+        static void init_viewport(GLFWwindow *handle) noexcept;
+
         static void framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept;
 
         static void key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept;
 
-        static void init_viewport(GLFWwindow *handle) noexcept;
+        static void mouse_button_callback(GLFWwindow *handle, int button, int action, int mods) noexcept;
+
+        static void cursor_pos_callback(GLFWwindow *handle, double x_pos, double y_pos) noexcept;
+
+        static void scroll_callback(GLFWwindow *handle, double x_offset, double y_offset) noexcept;
 
         static int s_window_count;
 
