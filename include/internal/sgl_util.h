@@ -39,3 +39,12 @@
 #define SGL_OFFSET_OF(type, member)    (offsetof(type, member))
 
 #define SGL_PTR_OFFSET_OF(type, member)    (reinterpret_cast<void *>(offsetof(type, member)))
+
+#define SGL_SIZEOF_MEMBER(type, member)    (sizeof(((type *)0)->member))
+
+namespace sgl {
+    template<typename T, std::size_t N>
+    constexpr std::size_t arr_len(T (&)[N]) noexcept {
+        return N;
+    }
+}

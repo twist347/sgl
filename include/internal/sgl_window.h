@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "sgl_expected.h"
 
@@ -62,6 +63,8 @@ namespace sgl {
         [[nodiscard]] int width() const noexcept;
 
         [[nodiscard]] int height() const noexcept;
+
+        [[nodiscard]] std::pair<int, int> sizes() const noexcept;
 
         static void poll_events() noexcept;
 

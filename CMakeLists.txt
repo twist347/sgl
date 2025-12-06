@@ -38,6 +38,7 @@ add_library(
         src/sgl_texture.cpp
         src/sgl_time.cpp
         src/sgl_input.cpp
+        src/sgl_gl_info.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)

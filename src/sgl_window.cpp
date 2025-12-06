@@ -139,15 +139,17 @@ namespace sgl {
     }
 
     int window::width() const noexcept {
-        int w = 0, h = 0;
-        glfwGetWindowSize(m_window, &w, &h);
-        return w;
+        return sizes().first;
     }
 
     int window::height() const noexcept {
+        return sizes().second;
+    }
+
+    [[nodiscard]] std::pair<int, int> window::sizes() const noexcept {
         int w = 0, h = 0;
         glfwGetWindowSize(m_window, &w, &h);
-        return h;
+        return {w, h};
     }
 
     void window::poll_events() noexcept {
