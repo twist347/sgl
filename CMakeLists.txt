@@ -39,6 +39,7 @@ add_library(
         src/sgl_time.cpp
         src/sgl_input.cpp
         src/sgl_gl_info.cpp
+        src/sgl_camera.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)
@@ -47,6 +48,7 @@ target_include_directories(
         PUBLIC
         include
         ${TL_DIR}
+        ${GLM_DIR}
         PRIVATE
         ${STB_IMAGE_DIR}
 )

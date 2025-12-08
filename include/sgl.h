@@ -19,3 +19,4 @@
 #include "internal/sgl_file.h"
 #include "internal/sgl_key.h"
 #include "internal/sgl_input.h"
+#include "internal/sgl_camera.h"

@@ -251,15 +251,15 @@ namespace sgl::input {
         return !now && prev;
     }
 
-    void mouse_position(double &x, double &y) noexcept {
+    void mouse_pos(double &x, double &y) noexcept {
         detail::input::mouse_position_impl(x, y);
     }
 
-    void mouse_delta(double &dx, double &dy) noexcept {
+    void mouse_dt(double &dx, double &dy) noexcept {
         detail::input::mouse_delta_impl(dx, dy);
     }
 
-    void scroll_delta(double &dx, double &dy) noexcept {
+    void scroll_dt(double &dx, double &dy) noexcept {
         detail::input::scroll_delta_impl(dx, dy);
     }
 }

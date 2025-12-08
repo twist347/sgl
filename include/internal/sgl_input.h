@@ -15,11 +15,11 @@ namespace sgl::input {
     bool is_mouse_button_pressed(mouse_button b) noexcept;
     bool is_mouse_button_released(mouse_button b) noexcept;
 
-    void mouse_position(double &x, double &y) noexcept;
+    void mouse_pos(double &x, double &y) noexcept;
 
-    void mouse_delta(double &dx, double &dy) noexcept;
+    void mouse_dt(double &dx, double &dy) noexcept;
 
-    void scroll_delta(double &dx, double &dy) noexcept;
+    void scroll_dt(double &dx, double &dy) noexcept;
 }
 
 namespace sgl::detail::input {

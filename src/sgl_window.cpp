@@ -12,6 +12,7 @@
 #include "internal/sgl_backend.h"
 #include "internal/sgl_time.h"
 #include "internal/sgl_input.h"
+#include "internal/sgl_time.h"
 
 namespace sgl {
     int window::s_window_count = 0;
@@ -41,7 +42,7 @@ namespace sgl {
 
     // fabrics
 
-    window::result window::create(int width, int height, const char *title, bool show_fps) noexcept {
+    window::result window::create(int width, int height, const char *title) noexcept {
         if (width <= 0 || height <= 0 || !title) {
             return unexpected{error::invalid_params};
         }
@@ -82,25 +83,24 @@ namespace sgl {
         glfwSetCursorPosCallback(handle, cursor_pos_callback);
         glfwSetScrollCallback(handle, scroll_callback);
 
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
         if (s_window_count == 1) {
             detail::print_info();
         }
 
         auto w = window{handle};
 
-        if (show_fps) {
-            w.m_fps_state.enabled = true;
-            w.m_fps_state.last_time = get_time();
-            w.m_fps_state.base_title = title;
-        }
+        w.m_fps_state.base_title = title;
+        w.m_fps_state.last_time = get_time();
 
         return w;
     }
 
     // or panic wrappers
 
-    window window::create_or_panic(int width, int height, const char *title, bool show_fps) noexcept {
-        auto res = create(width, height, title, show_fps);
+    window window::create_or_panic(int width, int height, const char *title) noexcept {
+        auto res = create(width, height, title);
         if (!res) {
             SGL_LOG_FATAL("failed to create window: %s", err_to_str(res.error()));
         }
@@ -126,12 +126,36 @@ namespace sgl {
         }
     }
 
+    void window::set_cursor_enabled(bool enabled) const noexcept {
+        glfwSetInputMode(m_window, GLFW_CURSOR, enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    }
+
+    void window::set_show_fps(bool enabled) const noexcept {
+        m_fps_state.enabled = enabled;
+
+        if (enabled) {
+            m_fps_state.frames = 0;
+            m_fps_state.cur_fps = 0.0;
+            m_fps_state.last_time = get_time();
+
+            if (!m_fps_state.base_title.empty()) {
+                glfwSetWindowTitle(m_window, m_fps_state.base_title.c_str());
+            }
+        } else {
+            if (!m_fps_state.base_title.empty()) {
+                glfwSetWindowTitle(m_window, m_fps_state.base_title.c_str());
+            }
+        }
+    }
+
     bool window::should_close() const noexcept {
         return glfwWindowShouldClose(m_window) == GLFW_TRUE;
     }
 
     void window::swap_buffers() const noexcept {
         glfwSwapBuffers(m_window);
+
+        new_frame_time();
 
         if (m_fps_state.enabled) {
             count_fps();
@@ -210,7 +234,6 @@ namespace sgl {
 
         detail::input::on_scroll(x_offset, y_offset);
     }
-
 
     void window::count_fps() const noexcept {
         const double now = get_time();

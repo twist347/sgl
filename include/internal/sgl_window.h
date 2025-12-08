@@ -36,18 +36,18 @@ namespace sgl {
 
         // fabrics
 
-        static result create(int width, int height, const char *title, bool show_fps = true) noexcept;
+        static result create(int width, int height, const char *title) noexcept;
 
-        static result create(int width, int height, const std::string &title, bool show_fps = true) noexcept {
-            return create(width, height, title.c_str(), show_fps);
+        static result create(int width, int height, const std::string &title) noexcept {
+            return create(width, height, title.c_str());
         }
 
         // or panic wrappers
 
-        static window create_or_panic(int width, int height, const char *title, bool show_fps = true) noexcept;
+        static window create_or_panic(int width, int height, const char *title) noexcept;
 
-        static window create_or_panic(int width, int height, const std::string &title, bool show_fps = true) noexcept {
-            return create_or_panic(width, height, title.c_str(), show_fps);
+        static window create_or_panic(int width, int height, const std::string &title) noexcept {
+            return create_or_panic(width, height, title.c_str());
         }
 
         // api
@@ -55,6 +55,10 @@ namespace sgl {
         void make_current() const noexcept;
 
         void set_vsync(bool enabled) const noexcept;
+
+        void set_cursor_enabled(bool enabled) const noexcept;
+
+        void set_show_fps(bool enabled) const noexcept;
 
         [[nodiscard]] bool should_close() const noexcept;
 

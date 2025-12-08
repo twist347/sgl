@@ -1,10 +1,11 @@
 /*
-draw a spinning cube
+draw spinning cubes and spinning camera
 */
 
 #include "sgl.h"
 
 #include <array>
+#include <cmath>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -18,6 +19,10 @@ static constexpr auto SCREEN_TITLE = __FILE__;
 static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
 static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
 
+static constexpr auto CAM_RADIUS = 12.f;
+
+using vec3 = glm::vec<3, sgl::gl_float>;
+
 struct vertex {
     sgl::gl_float pos[3]{};
     sgl::color color{};
@@ -28,6 +33,7 @@ static bool enable_depth_test = true;
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
     window.set_vsync(true);
+    window.set_show_fps(true);
 
     constexpr std::array<vertex, 24> vertices = {
         {
@@ -97,6 +103,16 @@ int main() {
         }
     };
 
+    constexpr std::array<vec3, 5> cubes_pos = {
+        {
+            {0.f, 0.f, 0.f},
+            {2.f, 0.f, 1.f},
+            {-2.f, 0.f, 2.f},
+            {0.f, 2.f, 3.f},
+            {0.f, -2.f, 4.f},
+        }
+    };
+
     const auto vao = sgl::vertex_array::create_or_panic();
 
     const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
@@ -123,7 +139,8 @@ int main() {
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    auto view = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -3.f));
+    constexpr auto cam_target = glm::vec3(0.f, 0.f, 0.f);
+    constexpr auto cam_up = glm::vec3(0.f, 1.f, 0.f);
 
     auto projection = glm::perspective(
         glm::radians(45.f),
@@ -132,39 +149,45 @@ int main() {
     );
 
     const auto model_loc = shader.get_uniform_loc("u_model");
+    const auto view_loc = shader.get_uniform_loc("u_view");
 
     shader.use();
-    SGL_VERIFY(shader.set_uniform_mat4("u_view", glm::value_ptr(view)));
     SGL_VERIFY(shader.set_uniform_mat4("u_projection", glm::value_ptr(projection)));
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
-    if (enable_depth_test) {
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        glDisable(GL_DEPTH_TEST);
-    }
+    sgl::render::enable_depth_test(enable_depth_test);
 
     while (!window.should_close()) {
         sgl::render::clear_color_depth_buffer();
 
         if (sgl::input::is_key_pressed(sgl::key::d)) {
             enable_depth_test = !enable_depth_test;
-
-            if (enable_depth_test) {
-                glEnable(GL_DEPTH_TEST);
-            } else {
-                glDisable(GL_DEPTH_TEST);
-            }
         }
 
-        const auto angle = glm::radians(-45.f) * sgl::get_time_f();
-        auto model = glm::rotate(glm::mat4(1.f), angle, glm::vec3(1.f, 1.f, 1.f));
+        sgl::render::enable_depth_test(enable_depth_test);
+
+        const auto time = sgl::get_time_f();
+
+        const auto cam_pos = glm::vec3(std::sin(time) * CAM_RADIUS, 0.f, std::cos(time) * CAM_RADIUS);
+        auto view = glm::lookAt(cam_pos, cam_target, cam_up);
 
         shader.use();
-        SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
         vao.bind();
-        glDrawElements(GL_TRIANGLES, static_cast<sgl::gl_sizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+
+        SGL_VERIFY(shader.set_uniform_mat4(view_loc, glm::value_ptr(view)));
+
+        for (std::size_t i = 0; i < cubes_pos.size(); ++i) {
+            glm::mat4 model{1.f};
+
+            const float angle = glm::radians(45.f) * time + glm::radians(20.f) * static_cast<float>(i);
+
+            model = glm::translate(model, cubes_pos[i]);
+            model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
+
+            SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
+            glDrawElements(GL_TRIANGLES, static_cast<sgl::gl_sizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+        }
 
         window.swap_buffers();
         sgl::window::poll_events();
