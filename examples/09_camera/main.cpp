@@ -9,7 +9,6 @@
 #include "sgl.h"
 
 #include <array>
-#include <cstdlib>
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -113,76 +112,15 @@ static constexpr std::array<vec3, 5> g_cubes_pos = {
 
 static bool g_enable_depth_test = true;
 
-void handle_input(sgl::camera &cam, float dt) {
-    float forward = 0.f;
-    float right = 0.f;
-    float up = 0.f;
-
-    // WASD + Q/E
-    if (sgl::input::is_key_down(sgl::key::w)) forward += 1.f;
-    if (sgl::input::is_key_down(sgl::key::s)) forward -= 1.f;
-
-    if (sgl::input::is_key_down(sgl::key::d)) right += 1.f;
-    if (sgl::input::is_key_down(sgl::key::a)) right -= 1.f;
-
-    if (sgl::input::is_key_down(sgl::key::e)) up += 1.f;
-    if (sgl::input::is_key_down(sgl::key::q)) up -= 1.f;
-
-    if (forward != 0.f) cam.move_forward(forward * MOVE_SPEED * dt);
-    if (right != 0.f) cam.move_right(right * MOVE_SPEED * dt);
-    if (up != 0.f) cam.move_up(up * MOVE_SPEED * dt);
-
-    // toggle depth test
-    if (sgl::input::is_key_pressed(sgl::key::z)) {
-        g_enable_depth_test = !g_enable_depth_test;
-    }
-
-    // mouse rotate
-    double dx = 0.0;
-    double dy = 0.0;
-    sgl::input::mouse_dt(dx, dy);
-
-    if (dx != 0.0 || dy != 0.0) {
-        const float yaw_dt = static_cast<float>(dx) * MOVE_SENSE;
-        const float pitch_dt = static_cast<float>(-dy) * MOVE_SENSE;
-        cam.rotate(yaw_dt, pitch_dt);
-    }
-}
+void handle_input(sgl::camera &cam, float dt);
 
 void render_scene(
     const sgl::shader &shader,
     const sgl::vertex_array &vao,
     const sgl::camera &cam,
-    const sgl::gl_int model_loc,
-    const sgl::gl_int view_loc
-) {
-    sgl::render::enable_depth_test(g_enable_depth_test);
-
-    const auto view = cam.get_view_mat();
-    SGL_VERIFY(shader.set_uniform_mat4(view_loc, glm::value_ptr(view)));
-
-    vao.bind();
-    shader.use();
-
-    for (std::size_t i = 0; i < g_cubes_pos.size(); ++i) {
-        glm::mat4 model{1.f};
-
-        const float t = sgl::get_time_f();
-        const float angle = glm::radians(45.f) * t + glm::radians(20.f) * static_cast<float>(i);
-
-        model = glm::translate(model, g_cubes_pos[i]);
-        model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
-
-        SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
-
-        glDrawElements(
-            GL_TRIANGLES,
-            static_cast<sgl::gl_sizei>(g_indices.size()),
-            GL_UNSIGNED_INT,
-            nullptr
-        );
-    }
-}
+    sgl::gl_int model_loc,
+    sgl::gl_int view_loc
+);
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
@@ -196,6 +134,8 @@ int main() {
         0.1f,
         100.f
     );
+    cam.set_move_speed(MOVE_SPEED);
+    cam.set_sens(MOVE_SENSE);
 
     const auto vao = sgl::vertex_array::create_or_panic();
     const auto vbo = sgl::vertex_buffer::create_or_panic(g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW);
@@ -245,4 +185,60 @@ int main() {
     }
 
     return EXIT_SUCCESS;
+}
+
+void handle_input(sgl::camera &cam, float dt) {
+    // WASD + Q/E
+    if (sgl::input::is_key_down(sgl::key::w)) cam.move_forward(dt);
+    if (sgl::input::is_key_down(sgl::key::s)) cam.move_backward(dt);
+
+    if (sgl::input::is_key_down(sgl::key::d)) cam.move_right(dt);
+    if (sgl::input::is_key_down(sgl::key::a)) cam.move_left(dt);
+
+    if (sgl::input::is_key_down(sgl::key::e)) cam.move_up(dt);
+    if (sgl::input::is_key_down(sgl::key::q)) cam.move_down(dt);
+
+    // toggle depth test
+    if (sgl::input::is_key_pressed(sgl::key::z)) {
+        g_enable_depth_test = !g_enable_depth_test;
+    }
+
+    if (const auto [dx, dy] = sgl::input::mouse_dt(); dx != 0.0 || dy != 0.0) {
+        cam.rotate(static_cast<float>(dx), static_cast<float>(-dy));
+    }
+}
+
+void render_scene(
+    const sgl::shader &shader,
+    const sgl::vertex_array &vao,
+    const sgl::camera &cam,
+    sgl::gl_int model_loc,
+    sgl::gl_int view_loc
+) {
+    sgl::render::enable_depth_test(g_enable_depth_test);
+
+    const auto view = cam.get_view_mat();
+    SGL_VERIFY(shader.set_uniform_mat4(view_loc, glm::value_ptr(view)));
+
+    vao.bind();
+    shader.use();
+
+    for (std::size_t i = 0; i < g_cubes_pos.size(); ++i) {
+        glm::mat4 model{1.f};
+
+        const float t = sgl::get_time_f();
+        const float angle = glm::radians(45.f) * t + glm::radians(20.f) * static_cast<float>(i);
+
+        model = glm::translate(model, g_cubes_pos[i]);
+        model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
+
+        SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
+
+        glDrawElements(
+            GL_TRIANGLES,
+            static_cast<sgl::gl_sizei>(g_indices.size()),
+            GL_UNSIGNED_INT,
+            nullptr
+        );
+    }
 }

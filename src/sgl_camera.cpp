@@ -12,6 +12,7 @@ namespace sgl {
     camera camera::create(float fov_deg, float aspect, float z_near, float z_far) noexcept {
         camera cam;
         cam.set_projection(fov_deg, aspect, z_near, z_far);
+        cam.update_vecs();
         return cam;
     }
 
@@ -25,19 +26,21 @@ namespace sgl {
 
     // moves
     void camera::move_forward(float dt) noexcept {
-        m_pos += m_front * dt;
+        m_pos += m_front * (m_move_speed * dt);
     }
 
     void camera::move_right(float dt) noexcept {
-        m_pos += right() * dt;
+        m_pos += m_right * (m_move_speed * dt);
     }
 
     void camera::move_up(float dt) noexcept {
-        m_pos += m_up * dt;
+        m_pos += m_world_up * (m_move_speed * dt);
     }
 
     void camera::rotate(float yaw_dt, float pitch_dt) noexcept {
-        set_yaw_pitch(m_yaw + yaw_dt, m_pitch + pitch_dt);
+        const float scaled_yaw = yaw_dt * m_sens;
+        const float scaled_pitch = pitch_dt * m_sens;
+        set_yaw_pitch(m_yaw + scaled_yaw, m_pitch + scaled_pitch);
     }
 
     void camera::set_projection(float fov, float aspect, float z_near, float z_far) noexcept {
@@ -47,12 +50,12 @@ namespace sgl {
         m_z_far = z_far;
     }
 
-    [[nodiscard]] glm::mat4 camera::get_view_mat() const noexcept {
+    glm::mat4 camera::get_view_mat() const noexcept {
         const auto target = m_pos + m_front;
         return glm::lookAt(m_pos, target, m_up);
     }
 
-    [[nodiscard]] glm::mat4 camera::get_projection_mat() const noexcept {
+    glm::mat4 camera::get_projection_mat() const noexcept {
         return glm::perspective(glm::radians(m_fov), m_aspect, m_z_near, m_z_far);
     }
 
@@ -69,7 +72,7 @@ namespace sgl {
 
         m_front = glm::normalize(front);
 
-        const glm::vec3 right_vec = glm::normalize(glm::cross(m_front, m_world_up));
-        m_up = glm::normalize(glm::cross(right_vec, m_front));
+        m_right = glm::normalize(glm::cross(m_front, m_world_up));
+        m_up = glm::normalize(glm::cross(m_right, m_front));
     }
 }

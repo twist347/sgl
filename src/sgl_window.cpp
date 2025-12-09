@@ -170,7 +170,7 @@ namespace sgl {
         return sizes().second;
     }
 
-    [[nodiscard]] std::pair<int, int> window::sizes() const noexcept {
+    std::pair<int, int> window::sizes() const noexcept {
         int w = 0, h = 0;
         glfwGetWindowSize(m_window, &w, &h);
         return {w, h};

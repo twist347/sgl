@@ -19,17 +19,29 @@ namespace sgl {
         [[nodiscard]] float get_pitch() const noexcept { return m_pitch; }
 
         [[nodiscard]] const glm::vec3 &get_front() const noexcept { return m_front; }
-        [[nodiscard]] glm::vec3 right() const noexcept { return glm::normalize(glm::cross(m_front, m_world_up)); }
-        [[nodiscard]] glm::vec3 up() const noexcept { return m_up; }
+        [[nodiscard]] glm::vec3 get_right() const noexcept { return m_right; }
+        [[nodiscard]] glm::vec3 get_up() const noexcept { return m_up; }
 
         // moves
         void move_forward(float dt) noexcept;
 
+        void move_backward(float dt) noexcept { move_forward(-dt); }
+
         void move_right(float dt) noexcept;
+
+        void move_left(float dt) noexcept { move_right(-dt); }
 
         void move_up(float dt) noexcept;
 
+        void move_down(float dt) noexcept { move_up(-dt); }
+
         void rotate(float yaw_dt, float pitch_dt) noexcept;
+
+        void set_move_speed(float speed) noexcept { m_move_speed = speed; }
+        [[nodiscard]] float get_move_speed() const noexcept { return m_move_speed; }
+
+        void set_sens(float sens) noexcept { m_sens = sens; }
+        [[nodiscard]] float get_sens() const noexcept { return m_sens; }
 
         void set_projection(float fov, float aspect, float z_near, float z_far) noexcept;
 
@@ -54,6 +66,8 @@ namespace sgl {
         glm::vec3 m_world_up{0.f, 1.f, 0.f};
         glm::vec3 m_up{0.f, 1.f, 0.f};
 
+        glm::vec3 m_right{1.f, 0.f, 0.f};
+
         float m_yaw = -90.f;
         float m_pitch = 0.f;
 
@@ -61,5 +75,8 @@ namespace sgl {
         float m_aspect = 16.f / 9.f;
         float m_z_near = 1.f;
         float m_z_far = 100.f;
+
+        float m_move_speed = 5.f;
+        float m_sens = 0.1f;
     };
 }

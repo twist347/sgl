@@ -259,7 +259,19 @@ namespace sgl::input {
         detail::input::mouse_delta_impl(dx, dy);
     }
 
+    std::pair<double, double> mouse_dt() noexcept {
+        double dx, dy;
+        mouse_dt(dx, dy);
+        return {dx, dy};
+    }
+
     void scroll_dt(double &dx, double &dy) noexcept {
         detail::input::scroll_delta_impl(dx, dy);
+    }
+
+    std::pair<double, double> scroll_dt() noexcept {
+        double dx, dy;
+        scroll_dt(dx, dy);
+        return {dx, dy};
     }
 }

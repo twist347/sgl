@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "sgl_key.h"
 
 namespace sgl::input {
@@ -19,7 +21,11 @@ namespace sgl::input {
 
     void mouse_dt(double &dx, double &dy) noexcept;
 
+    std::pair<double, double> mouse_dt() noexcept;
+
     void scroll_dt(double &dx, double &dy) noexcept;
+
+    std::pair<double, double> scroll_dt() noexcept;
 }
 
 namespace sgl::detail::input {
