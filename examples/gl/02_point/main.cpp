@@ -1,5 +1,5 @@
 /*
-draw a line
+draw a point
 */
 
 #include "sgl.h"
@@ -25,10 +25,12 @@ int main() {
     window.set_vsync(true);
     window.set_show_fps(true);
 
-    constexpr std::array<vertex, 2> vertices = {
+    constexpr std::array<vertex, 4> vertices = {
         {
-            {.pos = {-0.8f, 0.f, 0.f}, .color = sgl::colors::red},
-            {.pos = {0.8f, 0.f, 0.f}, .color = sgl::colors::green},
+            {.pos = {-0.5f, 0.5f, 0.f}, .color = sgl::colors::red},
+            {.pos = {0.5f, 0.5f, 0.f}, .color = sgl::colors::green},
+            {.pos = {-0.5f, -0.5f, 0.f}, .color = sgl::colors::blue},
+            {.pos = {0.5f, -0.5f, 0.f}, .color = sgl::colors::yellow},
         }
     };
 
@@ -39,11 +41,11 @@ int main() {
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
@@ -52,7 +54,8 @@ int main() {
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    glLineWidth(5.0f);
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glPointSize(30.f);
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
@@ -62,7 +65,7 @@ int main() {
         shader.use();
         vao.bind();
 
-        glDrawArrays(GL_LINES, 0, vertices.size());
+        glDrawArrays(GL_POINTS, 0, vertices.size());
 
         sgl::vertex_array::unbind();
 

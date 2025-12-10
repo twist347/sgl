@@ -30,6 +30,10 @@ struct vertex {
 
 static bool enable_depth_test = true;
 
+static constexpr auto U_VIEW = "u_view";
+static constexpr auto U_MODEL = "u_model";
+static constexpr auto U_PROJECTION = "u_projection";
+
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
     window.set_vsync(true);
@@ -124,11 +128,11 @@ int main() {
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
@@ -148,11 +152,8 @@ int main() {
         0.1f, 100.f
     );
 
-    const auto model_loc = shader.get_uniform_loc("u_model");
-    const auto view_loc = shader.get_uniform_loc("u_view");
-
     shader.use();
-    SGL_VERIFY(shader.set_uniform_mat4("u_projection", glm::value_ptr(projection)));
+    SGL_VERIFY(shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(projection)));
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
@@ -175,7 +176,7 @@ int main() {
         shader.use();
         vao.bind();
 
-        SGL_VERIFY(shader.set_uniform_mat4(view_loc, glm::value_ptr(view)));
+        SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
         for (std::size_t i = 0; i < cubes_pos.size(); ++i) {
             glm::mat4 model{1.f};
@@ -185,7 +186,7 @@ int main() {
             model = glm::translate(model, cubes_pos[i]);
             model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
 
-            SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
+            SGL_VERIFY(shader.set_uniform_mat4(U_MODEL, glm::value_ptr(model)));
             glDrawElements(GL_TRIANGLES, static_cast<sgl::gl_sizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
         }
 

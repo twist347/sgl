@@ -112,9 +112,9 @@ static constexpr std::array<vec3, 5> g_cubes_pos = {
 
 static bool g_enable_depth_test = true;
 
-static constexpr auto u_view = "u_view";
-static constexpr auto u_model = "u_model";
-static constexpr auto u_projection = "u_projection";
+static constexpr auto U_VIEW = "u_view";
+static constexpr auto U_MODEL = "u_model";
+static constexpr auto U_PROJECTION = "u_projection";
 
 void handle_input(sgl::camera &cam, float dt);
 
@@ -144,11 +144,11 @@ int main() {
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
@@ -162,7 +162,7 @@ int main() {
     shader.use();
     {
         const auto proj = cam.get_projection_mat();
-        SGL_VERIFY(shader.set_uniform_mat4(u_projection, glm::value_ptr(proj)));
+        SGL_VERIFY(shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(proj)));
     }
 
     sgl::render::set_clear_color(sgl::colors::gray);
@@ -207,7 +207,7 @@ void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const
     sgl::render::enable_depth_test(g_enable_depth_test);
 
     const auto view = cam.get_view_mat();
-    SGL_VERIFY(shader.set_uniform_mat4(u_view, glm::value_ptr(view)));
+    SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
     vao.bind();
     shader.use();
@@ -221,7 +221,7 @@ void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const
         model = glm::translate(model, g_cubes_pos[i]);
         model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
 
-        SGL_VERIFY(shader.set_uniform_mat4(u_model, glm::value_ptr(model)));
+        SGL_VERIFY(shader.set_uniform_mat4(U_MODEL, glm::value_ptr(model)));
 
         glDrawElements(
             GL_TRIANGLES,

@@ -179,10 +179,10 @@ int main() {
     obj_vao.bind();
     vbo.bind();
 
-    obj_vao.attrib_pointer(
+    obj_vao.attrib_pointer_and_enable(
         0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
-    obj_vao.attrib_pointer(
+    obj_vao.attrib_pointer_and_enable(
         1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, normal)
     );
 
@@ -190,7 +190,7 @@ int main() {
 
     light_vao.bind();
     vbo.bind();
-    light_vao.attrib_pointer(
+    light_vao.attrib_pointer_and_enable(
         0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
     ebo.bind();
@@ -234,7 +234,6 @@ void handle_input(sgl::camera &cam, float dt) {
         cam.rotate(static_cast<float>(dx), static_cast<float>(-dy));
     }
 }
-
 
 void render_object(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     shader.use();

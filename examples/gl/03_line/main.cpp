@@ -1,5 +1,5 @@
 /*
-draw a triangle
+draw a line
 */
 
 #include "sgl.h"
@@ -17,7 +17,7 @@ static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
 
 struct vertex {
     sgl::gl_float pos[3]{};
-    sgl::gl_float color[3]{};
+    sgl::color color{};
 };
 
 int main() {
@@ -25,11 +25,10 @@ int main() {
     window.set_vsync(true);
     window.set_show_fps(true);
 
-    constexpr std::array<vertex, 3> vertices = {
+    constexpr std::array<vertex, 2> vertices = {
         {
-            {.pos = {-0.5f, -0.5f, 0.f}, .color = {1.f, 0.f, 0.f}},
-            {.pos = {0.5f, -0.5f, 0.f}, .color = {0.f, 1.f, 0.f}},
-            {.pos = {0.0f, 0.5f, 0.f}, .color = {0.f, 0.f, 1.f}},
+            {.pos = {-0.8f, 0.f, 0.f}, .color = sgl::colors::red},
+            {.pos = {0.8f, 0.f, 0.f}, .color = sgl::colors::green},
         }
     };
 
@@ -40,18 +39,20 @@ int main() {
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer(
+    vao.attrib_pointer_and_enable(
         0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer(
-        1, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+    vao.attrib_pointer_and_enable(
+        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+
+    glLineWidth(5.0f);
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
@@ -61,7 +62,8 @@ int main() {
         shader.use();
         vao.bind();
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_LINES, 0, vertices.size());
+
         sgl::vertex_array::unbind();
 
         window.swap_buffers();

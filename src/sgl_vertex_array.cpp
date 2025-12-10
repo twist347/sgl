@@ -72,43 +72,48 @@ namespace sgl {
     }
 
     void vertex_array::attrib_pointer(
-        gl_uint idx,
-        gl_int size,
-        gl_enum type,
-        gl_boolean normalized,
-        gl_sizei stride,
-        const void *pointer
+        gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id != 0);
 
         glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
-        glEnableVertexAttribArray(idx);
+    }
+
+    void vertex_array::attrib_pointer_and_enable(
+        gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
+    ) const noexcept {
+        attrib_pointer(idx, size, type, normalized, stride, pointer);
+        enable_attrib(idx);
     }
 
     void vertex_array::attrib_pointer_i(
-        gl_uint idx,
-        gl_int size,
-        gl_enum type,
-        gl_sizei stride,
-        const void *pointer
+        gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id != 0);
 
         glVertexAttribIPointer(idx, size, type, stride, pointer);
-        glEnableVertexAttribArray(idx);
+    }
+
+    void vertex_array::attrib_pointer_i_and_enable(
+        gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
+    ) const noexcept {
+        attrib_pointer_i(idx, size, type, stride, pointer);
+        enable_attrib(idx);
     }
 
     void vertex_array::attrib_pointer_l(
-        gl_uint idx,
-        gl_int size,
-        gl_enum type,
-        gl_sizei stride,
-        const void *pointer
+        gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id != 0);
 
         glVertexAttribLPointer(idx, size, type, stride, pointer);
-        glEnableVertexAttribArray(idx);
+    }
+
+    void vertex_array::attrib_pointer_l_and_enable(
+        gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
+    ) const noexcept {
+        attrib_pointer_l(idx, size, type, stride, pointer);
+        enable_attrib(idx);
     }
 
     constexpr const char *vertex_array::err_to_str(error e) noexcept {

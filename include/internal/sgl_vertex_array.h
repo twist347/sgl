@@ -50,11 +50,23 @@ namespace sgl {
             gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
         ) const noexcept;
 
+        void attrib_pointer_and_enable(
+            gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
+        ) const noexcept;
+
         void attrib_pointer_i(
             gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
 
+        void attrib_pointer_i_and_enable(
+            gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
+        ) const noexcept;
+
         void attrib_pointer_l(
+            gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
+        ) const noexcept;
+
+        void attrib_pointer_l_and_enable(
             gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
 
