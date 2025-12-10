@@ -112,15 +112,13 @@ static constexpr std::array<vec3, 5> g_cubes_pos = {
 
 static bool g_enable_depth_test = true;
 
+static constexpr auto u_view = "u_view";
+static constexpr auto u_model = "u_model";
+static constexpr auto u_projection = "u_projection";
+
 void handle_input(sgl::camera &cam, float dt);
 
-void render_scene(
-    const sgl::shader &shader,
-    const sgl::vertex_array &vao,
-    const sgl::camera &cam,
-    sgl::gl_int model_loc,
-    sgl::gl_int view_loc
-);
+void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam);
 
 int main() {
     const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
@@ -161,13 +159,10 @@ int main() {
 
     const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    const auto model_loc = shader.get_uniform_loc("u_model");
-    const auto view_loc = shader.get_uniform_loc("u_view");
-
     shader.use();
     {
         const auto proj = cam.get_projection_mat();
-        SGL_VERIFY(shader.set_uniform_mat4("u_projection", glm::value_ptr(proj)));
+        SGL_VERIFY(shader.set_uniform_mat4(u_projection, glm::value_ptr(proj)));
     }
 
     sgl::render::set_clear_color(sgl::colors::gray);
@@ -178,7 +173,7 @@ int main() {
         const float dt = sgl::get_dt_f();
 
         handle_input(cam, dt);
-        render_scene(shader, vao, cam, model_loc, view_loc);
+        render_scene(shader, vao, cam);
 
         window.swap_buffers();
         sgl::window::poll_events();
@@ -208,17 +203,11 @@ void handle_input(sgl::camera &cam, float dt) {
     }
 }
 
-void render_scene(
-    const sgl::shader &shader,
-    const sgl::vertex_array &vao,
-    const sgl::camera &cam,
-    sgl::gl_int model_loc,
-    sgl::gl_int view_loc
-) {
+void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     sgl::render::enable_depth_test(g_enable_depth_test);
 
     const auto view = cam.get_view_mat();
-    SGL_VERIFY(shader.set_uniform_mat4(view_loc, glm::value_ptr(view)));
+    SGL_VERIFY(shader.set_uniform_mat4(u_view, glm::value_ptr(view)));
 
     vao.bind();
     shader.use();
@@ -232,7 +221,7 @@ void render_scene(
         model = glm::translate(model, g_cubes_pos[i]);
         model = glm::rotate(model, angle, glm::vec3(1.f, 1.f, 1.f));
 
-        SGL_VERIFY(shader.set_uniform_mat4(model_loc, glm::value_ptr(model)));
+        SGL_VERIFY(shader.set_uniform_mat4(u_model, glm::value_ptr(model)));
 
         glDrawElements(
             GL_TRIANGLES,

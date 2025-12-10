@@ -107,16 +107,40 @@ namespace sgl {
         bool set_uniform(const char *name, gl_uint v) const noexcept;
         bool set_uniform(const char *name, gl_float v) const noexcept;
 
+        bool set_uniform(const std::string &name, gl_int v) const noexcept { return set_uniform(name.c_str(), v); }
+        bool set_uniform(const std::string &name, gl_uint v) const noexcept { return set_uniform(name.c_str(), v); }
+        bool set_uniform(const std::string &name, gl_float v) const noexcept { return set_uniform(name.c_str(), v); }
+
         // vecs
 
         bool set_uniform_vec2(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
         bool set_uniform_vec3(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
         bool set_uniform_vec4(const char *name, const gl_float *v, gl_sizei count = 1) const noexcept;
 
+        bool set_uniform_vec2(const std::string &name, const gl_float *v, gl_sizei count = 1) const noexcept {
+            return set_uniform_vec2(name.c_str(), v, count);
+        }
+
+        bool set_uniform_vec3(const std::string &name, const gl_float *v, gl_sizei count = 1) const noexcept {
+            return set_uniform_vec3(name.c_str(), v, count);
+        }
+
+        bool set_uniform_vec4(const std::string &name, const gl_float *v, gl_sizei count = 1) const noexcept {
+            return set_uniform_vec4(name.c_str(), v, count);
+        }
+
         // mats (column major)
 
         bool set_uniform_mat3(const char *name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
         bool set_uniform_mat4(const char *name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept;
+
+        bool set_uniform_mat3(const std::string &name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept {
+            return set_uniform_mat3(name.c_str(), m, transpose, count);
+        }
+
+        bool set_uniform_mat4(const std::string &name, const gl_float *m, gl_boolean transpose = false, gl_sizei count = 1) const noexcept {
+            return set_uniform_mat4(name.c_str(), m, transpose, count);
+        }
 
         constexpr static const char *err_to_str(error err) noexcept;
 
