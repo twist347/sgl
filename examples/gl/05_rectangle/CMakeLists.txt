@@ -2,6 +2,7 @@ set(T 05_rectangle)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)
+target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_custom_target(copy_shaders_${T} ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory

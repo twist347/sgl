@@ -2,6 +2,7 @@ set(T 10_lightning)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl glm)
+target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_custom_target(copy_shaders_${T} ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory

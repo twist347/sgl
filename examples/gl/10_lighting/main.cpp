@@ -1,4 +1,5 @@
 /*
+    Phong lighting demo
     Controls:
       - W / S  - forward / backward
       - A / D  - right / left
