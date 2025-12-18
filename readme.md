@@ -30,17 +30,18 @@ $ cmake --build build
 #include "sgl.h"
 
 int main() {
-    auto window = sgl::window::create_or_panic(1920, 1080, "sgl demo");
-    window.set_vsync(true);
+    const auto window = sgl::window::create_try({.width = 1920, .height = 1080, .title = "sgl demo"});
 
     sgl::render::set_clear_color(sgl::colors::gray);
 
     while (!window.should_close()) {
         sgl::render::clear_color_buffer();
-
-        // your rendering here
+        
+        // your render code here
 
         window.swap_buffers();
         sgl::window::poll_events();
     }
+
+    return EXIT_SUCCESS;
 }
