@@ -1,13 +1,13 @@
 #pragma once
 
 namespace sgl {
-    double get_time() noexcept;
+    double time() noexcept;
 
-    float get_time_f() noexcept;
+    float time_f() noexcept;
 
-    double get_dt() noexcept;
+    double dt() noexcept;
 
-    float get_dt_f() noexcept;
+    float dt_f() noexcept;
 
     void new_frame_time() noexcept;
 }

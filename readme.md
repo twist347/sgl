@@ -30,7 +30,9 @@ $ cmake --build build
 #include "sgl.h"
 
 int main() {
-    const auto window = sgl::window::create_try({.width = 1920, .height = 1080, .title = "sgl demo"});
+    const auto window = sgl::window::create_try(
+        {.width = 1920, .height = 1080, .title = "sgl demo"}
+    );
 
     sgl::render::set_clear_color(sgl::colors::gray);
 

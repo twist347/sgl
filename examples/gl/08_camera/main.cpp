@@ -159,7 +159,7 @@ int main() {
 
     shader.use();
     {
-        const auto proj = cam.get_projection_mat();
+        const auto proj = cam.projection_mat();
         SGL_VERIFY(shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(proj)));
     }
 
@@ -168,7 +168,7 @@ int main() {
     while (!window.should_close()) {
         sgl::render::clear_color_depth_buffer();
 
-        const float dt = sgl::get_dt_f();
+        const float dt = sgl::dt_f();
 
         handle_input(cam, dt);
         render_scene(shader, vao, cam);
@@ -204,7 +204,7 @@ void handle_input(sgl::camera &cam, float dt) {
 void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     sgl::render::enable_depth_test(g_enable_depth_test);
 
-    const auto view = cam.get_view_mat();
+    const auto view = cam.view_mat();
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
     vao.bind();
@@ -213,7 +213,7 @@ void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const
     for (std::size_t i = 0; i < g_cubes_pos.size(); ++i) {
         glm::mat4 model{1.f};
 
-        const float t = sgl::get_time_f();
+        const float t = sgl::time_f();
         const float angle = glm::radians(45.f) * t + glm::radians(20.f) * static_cast<float>(i);
 
         model = glm::translate(model, g_cubes_pos[i]);

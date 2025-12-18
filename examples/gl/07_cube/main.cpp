@@ -166,7 +166,7 @@ int main() {
 
         sgl::render::enable_depth_test(enable_depth_test);
 
-        const auto time = sgl::get_time_f();
+        const auto time = sgl::time_f();
 
         const auto cam_pos = glm::vec3(std::sin(time) * CAM_RADIUS, 0.f, std::cos(time) * CAM_RADIUS);
         auto view = glm::lookAt(cam_pos, cam_target, cam_up);

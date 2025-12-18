@@ -44,9 +44,9 @@ namespace sgl {
 
         void set_data(const void *data, gl_sizeiptr size) const noexcept;
 
-        [[nodiscard]] gl_uint get_id() const noexcept { return m_id; }
-        [[nodiscard]] gl_sizeiptr get_size() const noexcept { return m_size; }
-        [[nodiscard]] gl_enum get_usage() const noexcept { return m_usage; }
+        [[nodiscard]] gl_uint id() const noexcept { return m_id; }
+        [[nodiscard]] gl_sizeiptr size() const noexcept { return m_size; }
+        [[nodiscard]] gl_enum usage() const noexcept { return m_usage; }
 
         constexpr static const char *err_to_str(error e) noexcept;
 

@@ -21,7 +21,7 @@ namespace sgl {
     struct window_params {
         int width, height;
         const char *title;
-        int opengl_version_major = 3, opengl_version_minor = 3;
+        int opengl_min_ver_major = 3, opengl_min_ver_minor = 3;
         int fps = 60;
         bool show_fps = true;
         bool vsync = true;
@@ -73,6 +73,8 @@ namespace sgl {
         [[nodiscard]] int height() const noexcept;
 
         [[nodiscard]] std::pair<int, int> sizes() const noexcept;
+
+        GLFWwindow *handle() const noexcept;
 
         static void poll_events() noexcept;
 

@@ -50,12 +50,12 @@ namespace sgl {
         m_z_far = z_far;
     }
 
-    glm::mat4 camera::get_view_mat() const noexcept {
+    glm::mat4 camera::view_mat() const noexcept {
         const auto target = m_pos + m_front;
         return glm::lookAt(m_pos, target, m_up);
     }
 
-    glm::mat4 camera::get_projection_mat() const noexcept {
+    glm::mat4 camera::projection_mat() const noexcept {
         return glm::perspective(glm::radians(m_fov), m_aspect, m_z_near, m_z_far);
     }
 

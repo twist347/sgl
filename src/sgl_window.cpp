@@ -47,7 +47,7 @@ namespace sgl {
             return unexpected{error::invalid_params};
         }
 
-        if (params.opengl_version_major <= 0 || params.opengl_version_minor < 0) {
+        if (params.opengl_min_ver_major <= 0 || params.opengl_min_ver_minor < 0) {
             return unexpected{error::invalid_params};
         }
 
@@ -112,7 +112,7 @@ namespace sgl {
         if (enabled) {
             m_fps_state.frames = 0;
             m_fps_state.cur_fps = 0.0;
-            m_fps_state.last_time = get_time();
+            m_fps_state.last_time = time();
 
             if (!m_fps_state.base_title.empty()) {
                 glfwSetWindowTitle(m_window, m_fps_state.base_title.c_str());
@@ -150,6 +150,10 @@ namespace sgl {
         int w = 0, h = 0;
         glfwGetWindowSize(m_window, &w, &h);
         return {w, h};
+    }
+
+    GLFWwindow *window::handle() const noexcept {
+        return m_window;
     }
 
     void window::poll_events() noexcept {
@@ -212,7 +216,7 @@ namespace sgl {
     }
 
     void window::count_fps() const noexcept {
-        const double now = get_time();
+        const double now = time();
         ++m_fps_state.frames;
 
         if (const auto dt = now - m_fps_state.last_time; dt >= m_fps_state.interval_sec && dt > 0.0) {
@@ -241,8 +245,8 @@ namespace sgl {
 
         glfwDefaultWindowHints();
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, params->opengl_version_major);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, params->opengl_version_minor);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, params->opengl_min_ver_major);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, params->opengl_min_ver_minor);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -289,7 +293,7 @@ namespace sgl {
 
         auto win = window{handle};
         win.m_fps_state.base_title = title;
-        win.m_fps_state.last_time = get_time();
+        win.m_fps_state.last_time = time();
 
         win.set_vsync(params->vsync);
         win.set_cursor_enabled(params->cursor_enabled);

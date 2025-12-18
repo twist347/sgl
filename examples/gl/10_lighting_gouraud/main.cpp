@@ -1,5 +1,5 @@
 /*
-    Phong lighting demo
+    Gouraud lighting demo
     Controls:
       - W / S  - forward / backward
       - A / D  - right / left
@@ -154,7 +154,7 @@ int main() {
     const auto obj_shader = sgl::shader::create_from_files_try(OBJECT_VS_PATH, OBJECT_FS_PATH);
     const auto light_shader = sgl::shader::create_from_files_try(LIGHT_VS_PATH, LIGHT_FS_PATH);
 
-    const auto projection = cam.get_projection_mat();
+    const auto projection = cam.projection_mat();
     constexpr auto light_color = glm::vec3{1.f, 1.f, 1.f};
 
     obj_shader.use();
@@ -202,7 +202,7 @@ int main() {
     while (!window.should_close()) {
         sgl::render::clear_color_depth_buffer();
 
-        const float dt = sgl::get_dt_f();
+        const float dt = sgl::dt_f();
 
         handle_input(cam, dt);
         update_light_pos(obj_shader, dt);
@@ -233,19 +233,18 @@ void handle_input(sgl::camera &cam, float dt) {
     }
 }
 
-
 void render_object(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     shader.use();
 
-    const auto view = cam.get_view_mat();
-    const auto pos = cam.get_pos();
+    const auto view = cam.view_mat();
+    const auto pos = cam.pos();
 
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
     SGL_VERIFY(shader.set_uniform_vec3(U_VIEW_POS, glm::value_ptr(pos)));
 
     vao.bind();
 
-    const float t = sgl::get_time_f();
+    const float t = sgl::time_f();
 
     for (std::size_t i = 0; i < g_cube_positions.size(); ++i) {
         glm::mat4 model{1.f};
@@ -270,7 +269,7 @@ void render_object(const sgl::shader &shader, const sgl::vertex_array &vao, cons
 void render_light(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     shader.use();
 
-    const auto view = cam.get_view_mat();
+    const auto view = cam.view_mat();
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
     auto model = glm::translate(glm::mat4(1.f), light_pos);

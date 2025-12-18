@@ -11,19 +11,19 @@ namespace sgl {
         bool g_first_frame = true;
     }
 
-    double get_time() noexcept {
+    double time() noexcept {
         return glfwGetTime();
     }
 
-    float get_time_f() noexcept {
+    float time_f() noexcept {
         return static_cast<float>(glfwGetTime());
     }
 
-    double get_dt() noexcept {
+    double dt() noexcept {
         return g_delta_time;
     }
 
-    float get_dt_f() noexcept {
+    float dt_f() noexcept {
         return static_cast<float>(g_delta_time);
     }
 

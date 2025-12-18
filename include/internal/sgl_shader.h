@@ -75,13 +75,13 @@ namespace sgl {
 
         void use() const noexcept;
 
-        [[nodiscard]] gl_uint get_id() const noexcept { return m_program; }
+        [[nodiscard]] gl_uint id() const noexcept { return m_program; }
         [[nodiscard]] bool is_valid() const noexcept { return m_program != 0; }
 
-        [[nodiscard]] gl_int get_uniform_loc(const char *name) const noexcept;
+        [[nodiscard]] gl_int uniform_loc(const char *name) const noexcept;
 
-        [[nodiscard]] gl_int get_uniform_loc(const std::string &name) const noexcept {
-            return get_uniform_loc(name.c_str());
+        [[nodiscard]] gl_int uniform_loc(const std::string &name) const noexcept {
+            return uniform_loc(name.c_str());
         }
 
         // scalars
