@@ -110,7 +110,7 @@ namespace sgl {
 
     // or panic wrappers
 
-    shader shader::create_from_ids_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
+    shader shader::create_from_ids_try(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
         auto res = create_from_ids(vertex_shader, fragment_shader);
         if (!res) {
             const auto err = res.error();
@@ -119,7 +119,7 @@ namespace sgl {
         return std::move(*res);
     }
 
-    shader shader::create_from_source_or_panic(const char *vertex_src, const char *fragment_src) noexcept {
+    shader shader::create_from_source_try(const char *vertex_src, const char *fragment_src) noexcept {
         auto res = create_from_source(vertex_src, fragment_src);
         if (!res) {
             const auto err = res.error();
@@ -128,7 +128,7 @@ namespace sgl {
         return std::move(*res);
     }
 
-    shader shader::create_from_files_or_panic(const char *vertex_path, const char *fragment_path) noexcept {
+    shader shader::create_from_files_try(const char *vertex_path, const char *fragment_path) noexcept {
         auto res = create_from_files(vertex_path, fragment_path);
         if (!res) {
             const auto err = res.error();

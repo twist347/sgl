@@ -43,7 +43,7 @@ namespace sgl {
         return vertex_array{id};
     }
 
-    vertex_array vertex_array::create_or_panic() noexcept {
+    vertex_array vertex_array::create_try() noexcept {
         auto res = create();
         if (!res) {
             SGL_LOG_FATAL("failed to create vertex_array: %s", err_to_str(res.error()));

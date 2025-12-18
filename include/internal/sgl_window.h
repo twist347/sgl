@@ -7,6 +7,7 @@
 
 // forward decl
 struct GLFWwindow;
+struct GLFWmonitor;
 
 namespace sgl {
     enum class window_error {
@@ -15,6 +16,17 @@ namespace sgl {
         glfw_create_window_failed,
         glad_load_failed,
         count
+    };
+
+    struct window_params {
+        int width, height;
+        const char *title;
+        int opengl_version_major = 3, opengl_version_minor = 3;
+        int fps = 60;
+        bool show_fps = true;
+        bool vsync = true;
+        bool cursor_enabled = true;
+        bool fullscreen = false;
     };
 
     class window {
@@ -36,19 +48,11 @@ namespace sgl {
 
         // fabrics
 
-        static result create(int width, int height, const char *title) noexcept;
+        static result create(const window_params &params) noexcept;
 
-        static result create(int width, int height, const std::string &title) noexcept {
-            return create(width, height, title.c_str());
-        }
+        // try wrappers
 
-        // or panic wrappers
-
-        static window create_or_panic(int width, int height, const char *title) noexcept;
-
-        static window create_or_panic(int width, int height, const std::string &title) noexcept {
-            return create_or_panic(width, height, title.c_str());
-        }
+        static window create_try(const window_params &params) noexcept;
 
         // api
 
@@ -106,6 +110,12 @@ namespace sgl {
     private:
         explicit window(GLFWwindow *handle) noexcept : m_window{handle} {
         }
+
+        static result create_impl(
+            int width, int height, const char *title,
+            GLFWmonitor *monitor,
+            const window_params *params
+        ) noexcept;
 
         void destroy_window() noexcept;
 

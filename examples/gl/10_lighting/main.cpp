@@ -17,9 +17,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-static constexpr int SCREEN_WIDTH = 1920;
-static constexpr int SCREEN_HEIGHT = 1080;
-static constexpr auto SCREEN_TITLE = __FILE__;
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+static constexpr auto TITLE = __FILE__;
 
 static constexpr auto OBJECT_VS_PATH = "shaders/object.vert";
 static constexpr auto OBJECT_FS_PATH = "shaders/object.frag";
@@ -140,22 +140,19 @@ void render_light(const sgl::shader &shader, const sgl::vertex_array &vao, const
 void update_light_pos(const sgl::shader &shader, float dt);
 
 int main() {
-    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
-    window.set_vsync(true);
-    window.set_show_fps(true);
-    window.set_cursor_enabled(false);
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false});
 
     auto cam = sgl::camera::create(
         45.f,
-        static_cast<float>(SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT),
+        static_cast<float>(WIDTH) / static_cast<float>(HEIGHT),
         0.1f,
         100.f
     );
     cam.set_move_speed(MOVE_SPEED);
     cam.set_sens(MOVE_SENSE);
 
-    const auto obj_shader = sgl::shader::create_from_files_or_panic(OBJECT_VS_PATH, OBJECT_FS_PATH);
-    const auto light_shader = sgl::shader::create_from_files_or_panic(LIGHT_VS_PATH, LIGHT_FS_PATH);
+    const auto obj_shader = sgl::shader::create_from_files_try(OBJECT_VS_PATH, OBJECT_FS_PATH);
+    const auto light_shader = sgl::shader::create_from_files_try(LIGHT_VS_PATH, LIGHT_FS_PATH);
 
     const auto projection = cam.get_projection_mat();
     constexpr auto light_color = glm::vec3{1.f, 1.f, 1.f};
@@ -168,12 +165,12 @@ int main() {
     light_shader.use();
     SGL_VERIFY(light_shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(projection)));
 
-    const auto obj_vao = sgl::vertex_array::create_or_panic();
-    const auto light_vao = sgl::vertex_array::create_or_panic();
-    const auto vbo = sgl::vertex_buffer::create_or_panic(
+    const auto obj_vao = sgl::vertex_array::create_try();
+    const auto light_vao = sgl::vertex_array::create_try();
+    const auto vbo = sgl::vertex_buffer::create_try(
         g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW
     );
-    const auto ebo = sgl::element_buffer::create_or_panic(
+    const auto ebo = sgl::element_buffer::create_try(
         g_indices.data(), sizeof(g_indices), GL_UNSIGNED_INT, GL_STATIC_DRAW
     );
 

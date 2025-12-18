@@ -66,7 +66,7 @@ namespace sgl {
         return vertex_buffer{id, size, usage};
     }
 
-    vertex_buffer vertex_buffer::create_or_panic(const void *data, gl_sizeiptr size, gl_enum usage) noexcept {
+    vertex_buffer vertex_buffer::create_try(const void *data, gl_sizeiptr size, gl_enum usage) noexcept {
         auto res = create(data, size, usage);
         if (!res) {
             SGL_LOG_FATAL("failed to create vertex_buffer: %s", err_to_str(res.error()));

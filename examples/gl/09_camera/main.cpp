@@ -15,9 +15,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-static constexpr int SCREEN_WIDTH = 1920;
-static constexpr int SCREEN_HEIGHT = 1080;
-static constexpr auto SCREEN_TITLE = __FILE__;
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+static constexpr auto TITLE = __FILE__;
 
 static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
 static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
@@ -121,23 +121,21 @@ void handle_input(sgl::camera &cam, float dt);
 void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam);
 
 int main() {
-    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
-    window.set_vsync(true);
-    window.set_show_fps(true);
-    window.set_cursor_enabled(false);
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false});
+
 
     auto cam = sgl::camera::create(
         45.f,
-        static_cast<float>(SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT),
+        static_cast<float>(WIDTH) / static_cast<float>(HEIGHT),
         0.1f,
         100.f
     );
     cam.set_move_speed(MOVE_SPEED);
     cam.set_sens(MOVE_SENSE);
 
-    const auto vao = sgl::vertex_array::create_or_panic();
-    const auto vbo = sgl::vertex_buffer::create_or_panic(g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW);
-    const auto ebo = sgl::element_buffer::create_or_panic(
+    const auto vao = sgl::vertex_array::create_try();
+    const auto vbo = sgl::vertex_buffer::create_try(g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW);
+    const auto ebo = sgl::element_buffer::create_try(
         g_indices.data(), sizeof(g_indices), GL_UNSIGNED_INT, GL_STATIC_DRAW
     );
 
@@ -157,7 +155,7 @@ int main() {
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
-    const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+    const auto shader = sgl::shader::create_from_files_try(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
     shader.use();
     {

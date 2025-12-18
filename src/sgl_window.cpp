@@ -42,8 +42,12 @@ namespace sgl {
 
     // fabrics
 
-    window::result window::create(int width, int height, const char *title) noexcept {
-        if (width <= 0 || height <= 0 || !title) {
+    window::result window::create(const window_params &params) noexcept {
+        if (!params.title) {
+            return unexpected{error::invalid_params};
+        }
+
+        if (params.opengl_version_major <= 0 || params.opengl_version_minor < 0) {
             return unexpected{error::invalid_params};
         }
 
@@ -51,56 +55,28 @@ namespace sgl {
             return unexpected{error::glfw_init_failed};
         }
 
-        // reset
-        glfwDefaultWindowHints();
+        GLFWmonitor *monitor = nullptr;
+        const int width = params.width;
+        const int height = params.height;
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-        GLFWwindow *handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
-        if (!handle) {
-            return unexpected{error::glfw_create_window_failed};
+        if (params.fullscreen) {
+            monitor = glfwGetPrimaryMonitor();
+            if (!monitor) {
+                return unexpected{error::glfw_create_window_failed};
+            }
+        } else {
+            if (width <= 0 || height <= 0) {
+                return unexpected{error::invalid_params};
+            }
         }
 
-        glfwMakeContextCurrent(handle);
-
-        if (!detail::backend::ensure_glad()) {
-            glfwDestroyWindow(handle);
-            return unexpected{error::glad_load_failed};
-        }
-
-        ++s_window_count;
-
-        init_viewport(handle);
-
-        glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
-        glfwSetKeyCallback(handle, key_callback);
-        glfwSetMouseButtonCallback(handle, mouse_button_callback);
-        glfwSetCursorPosCallback(handle, cursor_pos_callback);
-        glfwSetScrollCallback(handle, scroll_callback);
-
-        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-        if (s_window_count == 1) {
-            detail::print_info();
-        }
-
-        auto w = window{handle};
-
-        w.m_fps_state.base_title = title;
-        w.m_fps_state.last_time = get_time();
-
-        return w;
+        return create_impl(width, height, params.title, monitor, &params);
     }
 
     // or panic wrappers
 
-    window window::create_or_panic(int width, int height, const char *title) noexcept {
-        auto res = create(width, height, title);
+    window window::create_try(const window_params &params) noexcept {
+        auto res = create(params);
         if (!res) {
             SGL_LOG_FATAL("failed to create window: %s", err_to_str(res.error()));
         }
@@ -252,6 +228,74 @@ namespace sgl {
             );
             glfwSetWindowTitle(m_window, buf);
         }
+    }
+
+    window::result window::create_impl(
+        int width, int height, const char *title,
+        GLFWmonitor *monitor,
+        const window_params *params
+    ) noexcept {
+        if (width <= 0 || height <= 0 || !title || !params) {
+            return unexpected{error::invalid_params};
+        }
+
+        glfwDefaultWindowHints();
+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, params->opengl_version_major);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, params->opengl_version_minor);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+        GLFWwindow *handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
+        if (!handle) {
+            return unexpected{error::glfw_create_window_failed};
+        }
+
+        if (params->fullscreen) {
+            int x = 0, y = 0, w = width, h = height;
+
+            if (monitor) {
+                // GLFW 3.3+: workarea
+                glfwGetMonitorWorkarea(monitor, &x, &y, &w, &h);
+            }
+
+            glfwSetWindowPos(handle, x, y);
+            glfwSetWindowSize(handle, w, h);
+        }
+
+        glfwMakeContextCurrent(handle);
+
+        if (!detail::backend::ensure_glad()) {
+            glfwDestroyWindow(handle);
+            return unexpected{error::glad_load_failed};
+        }
+
+        ++s_window_count;
+
+        init_viewport(handle);
+
+        glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
+        glfwSetKeyCallback(handle, key_callback);
+        glfwSetMouseButtonCallback(handle, mouse_button_callback);
+        glfwSetCursorPosCallback(handle, cursor_pos_callback);
+        glfwSetScrollCallback(handle, scroll_callback);
+        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+        if (s_window_count == 1) {
+            detail::print_info();
+        }
+
+        auto win = window{handle};
+        win.m_fps_state.base_title = title;
+        win.m_fps_state.last_time = get_time();
+
+        win.set_vsync(params->vsync);
+        win.set_cursor_enabled(params->cursor_enabled);
+        win.set_show_fps(params->show_fps);
+
+        return win;
     }
 
     void window::destroy_window() noexcept {

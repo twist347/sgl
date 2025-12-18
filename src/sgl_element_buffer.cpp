@@ -85,7 +85,7 @@ namespace sgl {
         return element_buffer{id, size, count, index_type, usage};
     }
 
-    element_buffer element_buffer::create_or_panic(
+    element_buffer element_buffer::create_try(
         const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
     ) noexcept {
         auto res = create(data, size, index_type, usage);

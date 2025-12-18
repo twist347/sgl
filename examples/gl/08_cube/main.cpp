@@ -12,9 +12,9 @@ draw spinning cubes and spinning camera
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-static constexpr int SCREEN_WIDTH = 1920;
-static constexpr int SCREEN_HEIGHT = 1080;
-static constexpr auto SCREEN_TITLE = __FILE__;
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+static constexpr auto TITLE = __FILE__;
 
 static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
 static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
@@ -35,9 +35,7 @@ static constexpr auto U_MODEL = "u_model";
 static constexpr auto U_PROJECTION = "u_projection";
 
 int main() {
-    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
-    window.set_vsync(true);
-    window.set_show_fps(true);
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE});
 
     constexpr std::array<vertex, 24> vertices = {
         {
@@ -117,11 +115,11 @@ int main() {
         }
     };
 
-    const auto vao = sgl::vertex_array::create_or_panic();
+    const auto vao = sgl::vertex_array::create_try();
 
-    const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
+    const auto vbo = sgl::vertex_buffer::create_try(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
-    const auto ebo = sgl::element_buffer::create_or_panic(
+    const auto ebo = sgl::element_buffer::create_try(
         indices.data(), sizeof(indices),GL_UNSIGNED_INT,GL_STATIC_DRAW
     );
 
@@ -141,14 +139,14 @@ int main() {
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
-    const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+    const auto shader = sgl::shader::create_from_files_try(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
     constexpr auto cam_target = glm::vec3(0.f, 0.f, 0.f);
     constexpr auto cam_up = glm::vec3(0.f, 1.f, 0.f);
 
     auto projection = glm::perspective(
         glm::radians(45.f),
-        static_cast<float>(SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT),
+        static_cast<float>(WIDTH) / static_cast<float>(HEIGHT),
         0.1f, 100.f
     );
 

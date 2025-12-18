@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sgl_log.h"
+
 #if !defined(__has_include)
   #error "This header requires __has_include (C++17+)."
 #endif
@@ -31,4 +33,13 @@ namespace sgl {
 
     template<typename E>
     using bad_expected_access = ns_exp::bad_expected_access<E>;
+
+    template<typename T, typename E>
+    T unwrap(expected<T, E> e, const char *msg = "") noexcept {
+        if (!e) {
+            SGL_LOG_FATAL("%s", msg);
+            return {};
+        }
+        return std::move(*e);
+    }
 }

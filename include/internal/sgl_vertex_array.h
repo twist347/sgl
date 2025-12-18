@@ -32,7 +32,7 @@ namespace sgl {
 
         // or panic wrapper
 
-        static vertex_array create_or_panic() noexcept;
+        static vertex_array create_try() noexcept;
 
         // api
 

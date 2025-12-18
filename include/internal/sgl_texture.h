@@ -80,10 +80,10 @@ namespace sgl {
 
         // or panic wrappers
 
-        static texture_2d create_from_file_or_panic(const char *path) noexcept;
+        static texture_2d create_from_file_try(const char *path) noexcept;
 
-        static texture_2d create_from_file_or_panic(const std::string &path) noexcept {
-            return create_from_file_or_panic(path.c_str());
+        static texture_2d create_from_file_try(const std::string &path) noexcept {
+            return create_from_file_try(path.c_str());
         }
 
         // api

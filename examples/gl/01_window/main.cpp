@@ -4,14 +4,12 @@ create window
 
 #include "sgl.h"
 
-static constexpr int SCREEN_WIDTH = 1920;
-static constexpr int SCREEN_HEIGHT = 1080;
-static constexpr auto SCREEN_TITLE = __FILE__;
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+static constexpr auto TITLE = __FILE__;
 
 int main() {
-    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
-    window.set_vsync(true);
-    window.set_show_fps(true);
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .fullscreen = true});
 
     sgl::render::set_clear_color(sgl::colors::gray);
 

@@ -34,7 +34,7 @@ namespace sgl {
 
         // or panic wrapper
 
-        static element_buffer create_or_panic(
+        static element_buffer create_try(
             const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
         ) noexcept;
 

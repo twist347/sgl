@@ -34,7 +34,7 @@ namespace sgl {
 
         // or panic wrapper
 
-        static vertex_buffer create_or_panic(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
+        static vertex_buffer create_try(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
 
         // api
 

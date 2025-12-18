@@ -157,7 +157,7 @@ namespace sgl {
 
     // or panic wrappers
 
-    texture_2d texture_2d::create_from_file_or_panic(const char *path) noexcept {
+    texture_2d texture_2d::create_from_file_try(const char *path) noexcept {
         auto res = create_from_file(path);
         if (!res) {
             SGL_LOG_FATAL("failed to create texture_2d from '%s': %s", path, err_to_str(res.error()));

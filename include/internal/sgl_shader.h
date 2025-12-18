@@ -53,22 +53,22 @@ namespace sgl {
 
         // or panic wrappers
 
-        static shader create_from_ids_or_panic(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
+        static shader create_from_ids_try(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
 
-        static shader create_from_source_or_panic(const char *vertex_src, const char *fragment_src) noexcept;
+        static shader create_from_source_try(const char *vertex_src, const char *fragment_src) noexcept;
 
-        static shader create_from_source_or_panic(
+        static shader create_from_source_try(
             const std::string &vertex_src, const std::string &fragment_src
         ) noexcept {
-            return create_from_source_or_panic(vertex_src.c_str(), fragment_src.c_str());
+            return create_from_source_try(vertex_src.c_str(), fragment_src.c_str());
         }
 
-        static shader create_from_files_or_panic(const char *vertex_path, const char *fragment_path) noexcept;
+        static shader create_from_files_try(const char *vertex_path, const char *fragment_path) noexcept;
 
-        static shader create_from_files_or_panic(
+        static shader create_from_files_try(
             const std::string &vertex_path, const std::string &fragment_path
         ) noexcept {
-            return create_from_files_or_panic(vertex_path.c_str(), fragment_path.c_str());
+            return create_from_files_try(vertex_path.c_str(), fragment_path.c_str());
         }
 
         // api

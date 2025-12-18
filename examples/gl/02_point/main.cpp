@@ -8,9 +8,9 @@ draw a point
 
 #include "glad/glad.h"
 
-static constexpr int SCREEN_WIDTH = 1920;
-static constexpr int SCREEN_HEIGHT = 1080;
-static constexpr auto SCREEN_TITLE = __FILE__;
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+static constexpr auto TITLE = __FILE__;
 
 static constexpr auto VERTEX_SHADER_PATH = "shaders/shader.vert";
 static constexpr auto FRAGMENT_SHADER_PATH = "shaders/shader.frag";
@@ -21,9 +21,7 @@ struct vertex {
 };
 
 int main() {
-    const auto window = sgl::window::create_or_panic(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE);
-    window.set_vsync(true);
-    window.set_show_fps(true);
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE});
 
     constexpr std::array<vertex, 4> vertices = {
         {
@@ -34,9 +32,9 @@ int main() {
         }
     };
 
-    const auto vao = sgl::vertex_array::create_or_panic();
+    const auto vao = sgl::vertex_array::create_try();
 
-    const auto vbo = sgl::vertex_buffer::create_or_panic(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
+    const auto vbo = sgl::vertex_buffer::create_try(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
 
     vao.bind();
     vbo.bind();
@@ -52,7 +50,7 @@ int main() {
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
-    const auto shader = sgl::shader::create_from_files_or_panic(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+    const auto shader = sgl::shader::create_from_files_try(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
     glPointSize(30.f);
