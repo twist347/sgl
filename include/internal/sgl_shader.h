@@ -51,7 +51,7 @@ namespace sgl {
             return create_from_files(vertex_path.c_str(), fragment_path.c_str());
         }
 
-        // or panic wrappers
+        // try wrappers
 
         static shader create_from_ids_try(gl_uint vertex_shader, gl_uint fragment_shader) noexcept;
 
@@ -142,7 +142,18 @@ namespace sgl {
             return set_uniform_mat4(name.c_str(), m, transpose, count);
         }
 
-        constexpr static const char *err_to_str(error err) noexcept;
+        inline constexpr static const char *err_to_str(error err) noexcept {
+            switch (err) {
+                case error::invalid_params: return "invalid params";
+                case error::file_io_failed: return "file I/O failed";
+                case error::gl_vertex_compile_failed: return "vertex shader compile failed";
+                case error::gl_fragment_compile_failed: return "fragment shader compile failed";
+                case error::gl_program_link_failed: return "shader program link failed";
+                case error::gl_create_shader_failed: return "glCreateShader() failed";
+                case error::gl_create_program_failed: return "glCreateProgram() failed";
+                default: return "unknown shader_error";
+            }
+        }
 
     private:
         static gl_uint compile_shader(gl_enum type, const char *src, error &out_err) noexcept;

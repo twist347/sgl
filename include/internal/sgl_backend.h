@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sgl::detail::backend {
+namespace sgl::detail {
     bool ensure_glfw() noexcept;
 
     bool ensure_glad() noexcept;

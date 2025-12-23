@@ -40,6 +40,7 @@ add_library(
         src/sgl_input.cpp
         src/sgl_gl_info.cpp
         src/sgl_camera.cpp
+        src/sgl_stb_image_impl.cpp
 )
 
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)

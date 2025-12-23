@@ -32,7 +32,7 @@ namespace sgl {
 
         static result create(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
 
-        // or panic wrapper
+        // try wrappers
 
         static vertex_buffer create_try(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
 
@@ -48,7 +48,14 @@ namespace sgl {
         [[nodiscard]] gl_sizeiptr size() const noexcept { return m_size; }
         [[nodiscard]] gl_enum usage() const noexcept { return m_usage; }
 
-        constexpr static const char *err_to_str(error e) noexcept;
+        inline constexpr static const char *err_to_str(error e) noexcept {
+            switch (e) {
+                case error::invalid_params: return "invalid params";
+                case error::gl_gen_buffers_failed: return "glGenBuffers() failed";
+                case error::gl_alloc_failed: return "glBufferData() failed to allocate";
+                default: return "unknown vertex_buffer_error";
+            }
+        }
 
     private:
         static bool check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept;

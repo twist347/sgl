@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 #include "internal/sgl_backend.h"
 #include "internal/sgl_log.h"
@@ -10,33 +11,48 @@
 
 namespace sgl {
     gl_info_result get_gl_info() noexcept {
-        gl_info info;
+        gl_info info{};
 
-        if (!detail::backend::ensure_glfw() || !detail::backend::ensure_glad()) {
-            SGL_LOG_ERROR("get_gl_info(): backend not initialized");
+        // GLFW init first
+        if (!detail::ensure_glfw()) {
+            SGL_LOG_ERROR("get_gl_info(): glfw init failed");
             return unexpected{gl_info_error::backend_not_initialized};
         }
 
-        const auto *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        const auto *renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        const auto *version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        const auto *glsl = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+        // Must have a current context before glad/gl calls
+        if (!glfwGetCurrentContext()) {
+            SGL_LOG_ERROR("get_gl_info(): no current OpenGL context");
+            return unexpected{gl_info_error::no_current_context};
+        }
 
-        if (vendor) {
+        // Load GL entry points (requires context on most platforms)
+        if (!detail::ensure_glad()) {
+            SGL_LOG_ERROR("get_gl_info(): glad init failed");
+            return unexpected{gl_info_error::backend_not_initialized};
+        }
+
+        // Strings
+        if (const auto *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR))) {
             info.vendor = vendor;
         }
-        if (renderer) {
+        if (const auto *renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER))) {
             info.renderer = renderer;
         }
-        if (version) {
+        if (const auto *version = reinterpret_cast<const char *>(glGetString(GL_VERSION))) {
             info.version_str = version;
         }
-        if (glsl) {
+        if (const auto *glsl = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))) {
             info.shading_language_str = glsl;
         }
 
         gl_int major = 0;
         gl_int minor = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+        info.version.major = major;
+        info.version.minor = minor;
+
         gl_int profile = 0;
         gl_int num_ext = 0;
 
@@ -58,7 +74,7 @@ namespace sgl {
             return false;
         }
 
-        if (!detail::backend::ensure_glfw() || !detail::backend::ensure_glad()) {
+        if (!detail::ensure_glfw() || !detail::ensure_glad()) {
             SGL_LOG_ERROR("has_extension(): backend not initialized");
             return false;
         }

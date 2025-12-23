@@ -16,4 +16,14 @@ namespace sgl::render {
     void enable_depth_test(bool enabled) noexcept;
 
     void enable_blend(bool enabled) noexcept;
+
+    void set_viewport(int x, int y, int w, int h) noexcept;
+
+    void set_polygon_mode_fill() noexcept;
+
+    void set_polygon_mode_line() noexcept;
+
+    void set_polygon_mode_point() noexcept;
+
+    void set_line_width(float width) noexcept;
 }

@@ -19,21 +19,21 @@ namespace sgl {
         [[nodiscard]] float pitch() const noexcept { return m_pitch; }
 
         [[nodiscard]] const glm::vec3 &front() const noexcept { return m_front; }
-        [[nodiscard]] glm::vec3 right() const noexcept { return m_right; }
-        [[nodiscard]] glm::vec3 up() const noexcept { return m_up; }
+        [[nodiscard]] const glm::vec3 &right() const noexcept { return m_right; }
+        [[nodiscard]] const glm::vec3 &up() const noexcept { return m_up; }
 
         // moves
         void move_forward(float dt) noexcept;
-
         void move_backward(float dt) noexcept { move_forward(-dt); }
 
         void move_right(float dt) noexcept;
-
         void move_left(float dt) noexcept { move_right(-dt); }
 
-        void move_up(float dt) noexcept;
+        void move_up_world(float dt) noexcept;
+        void move_down_world(float dt) noexcept { move_up_world(-dt); }
 
-        void move_down(float dt) noexcept { move_up(-dt); }
+        void move_up_local(float dt) noexcept;
+        void move_down_local(float dt) noexcept { move_up_local(-dt); }
 
         void rotate(float yaw_dt, float pitch_dt) noexcept;
 
@@ -50,12 +50,12 @@ namespace sgl {
         [[nodiscard]] float z_near() const noexcept { return m_z_near; }
         [[nodiscard]] float z_far() const noexcept { return m_z_far; }
 
-        [[nodiscard]] glm::mat4 view_mat() const noexcept;
+        [[nodiscard]] glm::mat4 view() const noexcept;
 
-        [[nodiscard]] glm::mat4 projection_mat() const noexcept;
+        [[nodiscard]] glm::mat4 projection() const noexcept;
 
-        [[nodiscard]] glm::mat4 view_projection_mat() const noexcept {
-            return projection_mat() * view_mat();
+        [[nodiscard]] glm::mat4 view_projection() const noexcept {
+            return projection() * view();
         }
 
     private:

@@ -1,8 +1,34 @@
 #pragma once
 
 #include <cstddef>
+#include <utility>
+#include <type_traits>
 
 #include "sgl_log.h"
+
+namespace sgl {
+    template<typename T, std::size_t N>
+    constexpr std::size_t arr_len(T (&)[N]) noexcept {
+        return N;
+    }
+
+    template<typename... Args>
+    constexpr void unused(Args &&...) noexcept {
+    }
+
+    template<typename T, typename M>
+    constexpr std::size_t sizeof_member(M T::*) noexcept {
+        return sizeof(M);
+    }
+
+    namespace detail {
+        template<typename T>
+        requires std::is_standard_layout_v<T>
+        constexpr std::size_t checked_offset(std::size_t off) noexcept {
+            return off;
+        }
+    }
+}
 
 #define SGL_UNUSED(val)    ((void) (val))
 
@@ -36,15 +62,8 @@
         );                                                                     \
     } while (0)
 
-#define SGL_OFFSET_OF(type, member)    (offsetof(type, member))
+#define SGL_OFFSET_OF(type, member)    (::sgl::detail::checked_offset<type>(offsetof(type, member)))
 
-#define SGL_PTR_OFFSET_OF(type, member)    (reinterpret_cast<void *>(offsetof(type, member)))
+#define SGL_PTR_OFFSET_OF(type, member)    (reinterpret_cast<void *>(SGL_OFFSET_OF(type, member)))
 
-#define SGL_SIZEOF_MEMBER(type, member)    (sizeof(((type *)0)->member))
-
-namespace sgl {
-    template<typename T, std::size_t N>
-    constexpr std::size_t arr_len(T (&)[N]) noexcept {
-        return N;
-    }
-}
+#define SGL_SIZEOF_MEMBER(type, member)    sizeof(std::declval<type>().member)

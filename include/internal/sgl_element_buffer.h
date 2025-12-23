@@ -32,7 +32,7 @@ namespace sgl {
 
         static result create(const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage) noexcept;
 
-        // or panic wrapper
+        // try wrappers
 
         static element_buffer create_try(
             const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
@@ -42,7 +42,7 @@ namespace sgl {
 
         void bind() const noexcept;
 
-        static void unbind() noexcept;
+        static void unbind_current_vao() noexcept;
 
         void set_data(const void *data, gl_sizeiptr size) noexcept;
 
@@ -52,7 +52,14 @@ namespace sgl {
         [[nodiscard]] gl_enum type() const noexcept { return m_type; }
         [[nodiscard]] gl_enum usage() const noexcept { return m_usage; }
 
-        constexpr static const char *err_to_str(error e) noexcept;
+        inline constexpr static const char *err_to_str(error e) noexcept {
+            switch (e) {
+                case error::invalid_params: return "invalid params";
+                case error::gl_gen_buffers_failed: return "glGenBuffers() failed";
+                case error::gl_alloc_failed: return "glBufferData() failed to allocate";
+                default: return "unknown element_buffer_error";
+            }
+        }
 
     private:
         constexpr static gl_sizeiptr index_type_size(gl_enum type) noexcept;

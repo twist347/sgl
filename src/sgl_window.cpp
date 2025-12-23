@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <cstdio>
+#include <cassert>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -12,7 +13,6 @@
 #include "internal/sgl_backend.h"
 #include "internal/sgl_time.h"
 #include "internal/sgl_input.h"
-#include "internal/sgl_time.h"
 
 namespace sgl {
     int window::s_window_count = 0;
@@ -47,11 +47,11 @@ namespace sgl {
             return unexpected{error::invalid_params};
         }
 
-        if (params.opengl_min_ver_major <= 0 || params.opengl_min_ver_minor < 0) {
+        if (params.min_gl_ver_major <= 0 || params.min_gl_ver_minor < 0) {
             return unexpected{error::invalid_params};
         }
 
-        if (!detail::backend::ensure_glfw()) {
+        if (!detail::ensure_glfw()) {
             return unexpected{error::glfw_init_failed};
         }
 
@@ -73,7 +73,7 @@ namespace sgl {
         return create_impl(width, height, params.title, monitor, &params);
     }
 
-    // or panic wrappers
+    // try wrappers
 
     window window::create_try(const window_params &params) noexcept {
         auto res = create(params);
@@ -86,10 +86,14 @@ namespace sgl {
     // api
 
     void window::make_current() const noexcept {
+        assert(m_window);
+
         glfwMakeContextCurrent(m_window);
     }
 
     void window::set_vsync(bool enabled) const noexcept {
+        assert(m_window);
+
         GLFWwindow *prev = glfwGetCurrentContext();
         if (prev != m_window) {
             glfwMakeContextCurrent(m_window);
@@ -103,10 +107,14 @@ namespace sgl {
     }
 
     void window::set_cursor_enabled(bool enabled) const noexcept {
+        assert(m_window);
+
         glfwSetInputMode(m_window, GLFW_CURSOR, enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
 
     void window::set_show_fps(bool enabled) const noexcept {
+        assert(m_window);
+
         m_fps_state.enabled = enabled;
 
         if (enabled) {
@@ -125,10 +133,14 @@ namespace sgl {
     }
 
     bool window::should_close() const noexcept {
+        assert(m_window);
+
         return glfwWindowShouldClose(m_window) == GLFW_TRUE;
     }
 
     void window::swap_buffers() const noexcept {
+        assert(m_window);
+
         glfwSwapBuffers(m_window);
 
         new_frame_time();
@@ -139,36 +151,42 @@ namespace sgl {
     }
 
     int window::width() const noexcept {
+        assert(m_window);
+
         return sizes().first;
     }
 
     int window::height() const noexcept {
+        assert(m_window);
+
         return sizes().second;
     }
 
     std::pair<int, int> window::sizes() const noexcept {
+        assert(m_window);
+
         int w = 0, h = 0;
         glfwGetWindowSize(m_window, &w, &h);
         return {w, h};
     }
 
+    [[nodiscard]] std::pair<int, int> window::framebuffer_size() const noexcept {
+        assert(m_window);
+
+        int w = 0, h = 0;
+        glfwGetFramebufferSize(m_window, &w, &h);
+        return {w, h};
+    }
+
     GLFWwindow *window::handle() const noexcept {
+        assert(m_window);
+
         return m_window;
     }
 
     void window::poll_events() noexcept {
-        sgl::detail::input::new_frame();
+        detail::input::new_frame();
         glfwPollEvents();
-    }
-
-    constexpr const char *window::err_to_str(window_error err) noexcept {
-        switch (err) {
-            case window_error::invalid_params: return "invalid params";
-            case window_error::glfw_init_failed: return "glfwInit() failed";
-            case window_error::glfw_create_window_failed: return "glfwCreateWindow() failed";
-            case window_error::glad_load_failed: return "gladLoadGLLoader() failed";
-            default: return "unknown window_error";
-        }
     }
 
     // internal
@@ -216,6 +234,8 @@ namespace sgl {
     }
 
     void window::count_fps() const noexcept {
+        assert(m_window);
+
         const double now = time();
         ++m_fps_state.frames;
 
@@ -245,8 +265,8 @@ namespace sgl {
 
         glfwDefaultWindowHints();
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, params->opengl_min_ver_major);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, params->opengl_min_ver_minor);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, params->min_gl_ver_major);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, params->min_gl_ver_minor);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -271,7 +291,7 @@ namespace sgl {
 
         glfwMakeContextCurrent(handle);
 
-        if (!detail::backend::ensure_glad()) {
+        if (!detail::ensure_glad()) {
             glfwDestroyWindow(handle);
             return unexpected{error::glad_load_failed};
         }
@@ -285,7 +305,6 @@ namespace sgl {
         glfwSetMouseButtonCallback(handle, mouse_button_callback);
         glfwSetCursorPosCallback(handle, cursor_pos_callback);
         glfwSetScrollCallback(handle, scroll_callback);
-        glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
         if (s_window_count == 1) {
             detail::print_info();
@@ -313,7 +332,7 @@ namespace sgl {
         --s_window_count;
         if (s_window_count == 0) {
             glfwTerminate();
-            detail::backend::reset();
+            detail::reset();
         }
     }
 }

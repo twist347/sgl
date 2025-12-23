@@ -159,7 +159,7 @@ int main() {
 
     shader.use();
     {
-        const auto proj = cam.projection_mat();
+        const auto proj = cam.projection();
         SGL_VERIFY(shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(proj)));
     }
 
@@ -188,8 +188,8 @@ void handle_input(sgl::camera &cam, float dt) {
     if (sgl::input::is_key_down(sgl::key::d)) cam.move_right(dt);
     if (sgl::input::is_key_down(sgl::key::a)) cam.move_left(dt);
 
-    if (sgl::input::is_key_down(sgl::key::e)) cam.move_up(dt);
-    if (sgl::input::is_key_down(sgl::key::q)) cam.move_down(dt);
+    if (sgl::input::is_key_down(sgl::key::e)) cam.move_up_world(dt);
+    if (sgl::input::is_key_down(sgl::key::q)) cam.move_down_world(dt);
 
     // toggle depth test
     if (sgl::input::is_key_pressed(sgl::key::z)) {
@@ -204,7 +204,7 @@ void handle_input(sgl::camera &cam, float dt) {
 void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     sgl::render::enable_depth_test(g_enable_depth_test);
 
-    const auto view = cam.view_mat();
+    const auto view = cam.view();
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
     vao.bind();

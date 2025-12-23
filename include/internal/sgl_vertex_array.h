@@ -5,7 +5,7 @@
 
 namespace sgl {
     enum class vertex_array_error {
-        gl_gen_buffers_failed = 0,
+        gl_gen_vertex_arrays_failed = 0,
         count
     };
 
@@ -30,7 +30,7 @@ namespace sgl {
 
         static result create() noexcept;
 
-        // or panic wrapper
+        // try wrappers
 
         static vertex_array create_try() noexcept;
 
@@ -70,7 +70,12 @@ namespace sgl {
             gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
         ) const noexcept;
 
-        constexpr static const char *err_to_str(error e) noexcept;
+        inline constexpr static const char *err_to_str(error e) noexcept {
+            switch (e) {
+                case error::gl_gen_vertex_arrays_failed: return "glGenVertexArrays() failed";
+                default: return "unknown vertex_array_error";
+            }
+        }
 
     private:
         explicit vertex_array(gl_uint id) noexcept : m_id{id} {

@@ -11,6 +11,7 @@ namespace sgl::detail {
     }
 
     inline bool read_text_file(const std::filesystem::path &path, std::string &out_src) noexcept {
-        return read_text_file(path.string().c_str(), out_src);
+        const auto s = path.string();
+        return read_text_file(s.c_str(), out_src);
     }
 }

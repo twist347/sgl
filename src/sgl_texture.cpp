@@ -1,10 +1,10 @@
 #include "internal/sgl_texture.h"
 
 #include <utility>
+#include <cassert>
 
 #include "glad/glad.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include "internal/sgl_log.h"
@@ -75,7 +75,7 @@ namespace sgl {
     // fabrics
 
     texture_2d::result texture_2d::create_from_file(const char *path) noexcept {
-        const texture_2d_params params{};
+        constexpr texture_2d_params params{};
         return create_from_file(path, params);
     }
 
@@ -118,26 +118,33 @@ namespace sgl {
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        GLenum format;
-        if (nr_channels == 1) {
-            format = GL_RED;
-        } else if (nr_channels == 3) {
-            format = GL_RGB;
-        } else if (nr_channels == 4) {
-            format = GL_RGBA;
-        } else {
-            SGL_LOG_WARN("texture_2d::create_from_file: unsupported channel count %d, assuming RGB", nr_channels);
-            format = GL_RGB;
-        }
+        GLenum format = 0;
+        GLint internal_format = 0;
 
-        auto internal_format = static_cast<GLint>(format);
-        if (params.srgb) {
-            if (format == GL_RGB) {
-                internal_format = GL_SRGB;
-            }
-            if (format == GL_RGBA) {
-                internal_format = GL_SRGB_ALPHA;
-            }
+        switch (nr_channels) {
+            case 1:
+                format = GL_RED;
+                internal_format = GL_R8;
+                break;
+            case 2:
+                format = GL_RG;
+                internal_format = GL_RG8;
+                break;
+            case 3:
+                format = GL_RGB;
+                internal_format = params.srgb ? GL_SRGB8 : GL_RGB8;
+                break;
+            case 4:
+                format = GL_RGBA;
+                internal_format = params.srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+                break;
+            default:
+                SGL_LOG_ERROR("texture_2d::create_from_file: unsupported channel count %d", nr_channels);
+                glPixelStorei(GL_UNPACK_ALIGNMENT, prev_alignment);
+                glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(prev_tex));
+                glDeleteTextures(1, &id);
+                stbi_image_free(data);
+                return unexpected{error::invalid_params};
         }
 
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -155,7 +162,7 @@ namespace sgl {
         return texture_2d{id, width, height, static_cast<gl_enum>(internal_format), format};
     }
 
-    // or panic wrappers
+    // try wrappers
 
     texture_2d texture_2d::create_from_file_try(const char *path) noexcept {
         auto res = create_from_file(path);
@@ -168,6 +175,8 @@ namespace sgl {
     // api
 
     void texture_2d::bind(gl_uint unit) const noexcept {
+        assert(m_id);
+
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, m_id);
     }

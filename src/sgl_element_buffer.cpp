@@ -61,7 +61,7 @@ namespace sgl {
         glGenBuffers(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenBuffers() returned 0");
-            return unexpected(error::gl_gen_buffers_failed);
+            return unexpected{error::gl_gen_buffers_failed};
         }
 
         GLint prev_ebo = 0;
@@ -70,7 +70,11 @@ namespace sgl {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
 
+#ifndef NDEBUB
         const bool ok = check_created_size_bound(GL_ELEMENT_ARRAY_BUFFER, size);
+#else
+        const bool ok = true;
+#endif
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prev_ebo);
 
@@ -85,6 +89,8 @@ namespace sgl {
         return element_buffer{id, size, count, index_type, usage};
     }
 
+    // try wrappers
+
     element_buffer element_buffer::create_try(
         const void *data, gl_sizeiptr size, gl_enum index_type, gl_enum usage
     ) noexcept {
@@ -98,17 +104,17 @@ namespace sgl {
     // api
 
     void element_buffer::bind() const noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
     }
 
-    void element_buffer::unbind() noexcept {
+    void element_buffer::unbind_current_vao() noexcept {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void element_buffer::set_data(const void *data, gl_sizeiptr size) noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         const gl_sizeiptr idx_size = index_type_size(m_type);
         if (size <= 0 || idx_size == 0 || (size % idx_size) != 0) {
@@ -123,15 +129,6 @@ namespace sgl {
 
         m_size = size;
         m_count = static_cast<gl_sizei>(size / idx_size);
-    }
-
-    constexpr const char *element_buffer::err_to_str(error e) noexcept {
-        switch (e) {
-            case error::invalid_params: return "invalid params";
-            case error::gl_gen_buffers_failed: return "glGenBuffers() failed";
-            case error::gl_alloc_failed: return "glBufferData() failed to allocate";
-            default: return "unknown element_buffer_error";
-        }
     }
 
     // internal

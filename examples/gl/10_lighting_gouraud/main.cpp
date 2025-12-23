@@ -154,7 +154,7 @@ int main() {
     const auto obj_shader = sgl::shader::create_from_files_try(OBJECT_VS_PATH, OBJECT_FS_PATH);
     const auto light_shader = sgl::shader::create_from_files_try(LIGHT_VS_PATH, LIGHT_FS_PATH);
 
-    const auto projection = cam.projection_mat();
+    const auto projection = cam.projection();
     constexpr auto light_color = glm::vec3{1.f, 1.f, 1.f};
 
     obj_shader.use();
@@ -225,8 +225,8 @@ void handle_input(sgl::camera &cam, float dt) {
     if (sgl::input::is_key_down(sgl::key::d)) cam.move_right(dt);
     if (sgl::input::is_key_down(sgl::key::a)) cam.move_left(dt);
 
-    if (sgl::input::is_key_down(sgl::key::e)) cam.move_up(dt);
-    if (sgl::input::is_key_down(sgl::key::q)) cam.move_down(dt);
+    if (sgl::input::is_key_down(sgl::key::e)) cam.move_up_world(dt);
+    if (sgl::input::is_key_down(sgl::key::q)) cam.move_down_world(dt);
 
     if (const auto [dx, dy] = sgl::input::mouse_dt(); dx != 0.0 || dy != 0.0) {
         cam.rotate(static_cast<float>(dx), static_cast<float>(-dy));
@@ -236,7 +236,7 @@ void handle_input(sgl::camera &cam, float dt) {
 void render_object(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     shader.use();
 
-    const auto view = cam.view_mat();
+    const auto view = cam.view();
     const auto pos = cam.pos();
 
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
@@ -269,7 +269,7 @@ void render_object(const sgl::shader &shader, const sgl::vertex_array &vao, cons
 void render_light(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam) {
     shader.use();
 
-    const auto view = cam.view_mat();
+    const auto view = cam.view();
     SGL_VERIFY(shader.set_uniform_mat4(U_VIEW, glm::value_ptr(view)));
 
     auto model = glm::translate(glm::mat4(1.f), light_pos);

@@ -38,6 +38,6 @@ namespace sgl::detail {
         SGL_LOG_INFO("Vendor:     %s", vendor.empty() ? "?" : vendor.c_str());
         SGL_LOG_INFO("Renderer:   %s", renderer.empty() ? "?" : renderer.c_str());
         SGL_LOG_INFO("Profile:    %s", profile_str);
-        SGL_LOG_INFO("Extensions: %d", num_extensions);
+        SGL_LOG_INFO("Extensions: %d", static_cast<int>(num_extensions));
     }
 }

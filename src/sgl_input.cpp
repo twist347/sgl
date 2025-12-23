@@ -1,28 +1,30 @@
 #include "internal/sgl_input.h"
 
 #include <cstring>
+#include <array>
+#include <cstddef>
 
 #include "GLFW/glfw3.h"
 
 namespace sgl::detail::input {
-    inline constexpr int max_keys = static_cast<int>(key::count);
-    inline constexpr int max_buttons = static_cast<int>(mouse_button::count);
+    inline constexpr std::size_t max_keys = static_cast<int>(key::count);
+    inline constexpr std::size_t max_buttons = static_cast<int>(mouse_button::count);
 
     struct state {
-        bool key_down[max_keys]{};
-        bool key_down_prev[max_keys]{};
+        std::array<bool, max_keys> key_down{};
+        std::array<bool, max_keys> key_down_prev{};
 
-        bool mouse_down[max_buttons]{};
-        bool mouse_down_prev[max_buttons]{};
+        std::array<bool, max_buttons> mouse_down{};
+        std::array<bool, max_buttons> mouse_down_prev{};
 
-        double mouse_x = 0.0;
-        double mouse_y = 0.0;
+        double mouse_x = 0.;
+        double mouse_y = 0.;
 
-        double mouse_dx = 0.0;
-        double mouse_dy = 0.0;
+        double mouse_dx = 0.;
+        double mouse_dy = 0.;
 
-        double scroll_dx = 0.0;
-        double scroll_dy = 0.0;
+        double scroll_dx = 0.;
+        double scroll_dy = 0.;
     };
 
     static state g_state{};
@@ -147,8 +149,8 @@ namespace sgl::detail::input {
 
 
     void new_frame() noexcept {
-        std::memcpy(g_state.key_down_prev, g_state.key_down, sizeof(g_state.key_down));
-        std::memcpy(g_state.mouse_down_prev, g_state.mouse_down, sizeof(g_state.mouse_down));
+        g_state.key_down_prev = g_state.key_down;
+        g_state.mouse_down_prev = g_state.mouse_down;
 
         g_state.mouse_dx = 0.0;
         g_state.mouse_dy = 0.0;
@@ -157,8 +159,8 @@ namespace sgl::detail::input {
     }
 
     static bool valid_key(key k) noexcept {
-        const int idx = static_cast<int>(k);
-        return idx >= 0 && idx < max_keys;
+        const auto idx = static_cast<std::size_t>(k);
+        return k != key::unknown && idx < max_keys;
     }
 
     static bool is_down_impl(key k) noexcept {
@@ -176,8 +178,8 @@ namespace sgl::detail::input {
     }
 
     static bool valid_mouse_button(mouse_button b) noexcept {
-        const int idx = static_cast<int>(b);
-        return idx >= 0 && idx < max_buttons;
+        const auto idx = static_cast<std::size_t>(b);
+        return b != mouse_button::unknown && idx < max_buttons;
     }
 
     static bool mouse_down_impl(mouse_button b) noexcept {

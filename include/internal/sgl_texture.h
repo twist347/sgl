@@ -78,7 +78,7 @@ namespace sgl {
             return create_from_file(path.c_str(), params);
         }
 
-        // or panic wrappers
+        // try wrappers
 
         static texture_2d create_from_file_try(const char *path) noexcept;
 

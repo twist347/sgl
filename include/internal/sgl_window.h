@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "sgl_expected.h"
+#include "sgl_config.h"
 
 // forward decl
 struct GLFWwindow;
@@ -21,12 +22,12 @@ namespace sgl {
     struct window_params {
         int width, height;
         const char *title;
-        int opengl_min_ver_major = 3, opengl_min_ver_minor = 3;
+        int min_gl_ver_major = default_min_gl_ver_major, min_gl_ver_minor = default_min_gl_ver_minor;
         int fps = 60;
         bool show_fps = true;
         bool vsync = true;
         bool cursor_enabled = true;
-        bool fullscreen = false;
+        bool fullscreen = false; // borderless fullscreen
     };
 
     class window {
@@ -74,11 +75,21 @@ namespace sgl {
 
         [[nodiscard]] std::pair<int, int> sizes() const noexcept;
 
+        [[nodiscard]] std::pair<int, int> framebuffer_size() const noexcept;
+
         GLFWwindow *handle() const noexcept;
 
         static void poll_events() noexcept;
 
-        constexpr static const char *err_to_str(error err) noexcept;
+        inline constexpr static const char *err_to_str(error err) noexcept {
+            switch (err) {
+                case window_error::invalid_params: return "invalid params";
+                case window_error::glfw_init_failed: return "glfwInit() failed";
+                case window_error::glfw_create_window_failed: return "glfwCreateWindow() failed";
+                case window_error::glad_load_failed: return "gladLoadGLLoader() failed";
+                default: return "unknown window_error";
+            }
+        }
 
     private:
         static void init_viewport(GLFWwindow *handle) noexcept;

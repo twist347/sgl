@@ -5,7 +5,7 @@
 
 #include "internal/sgl_log.h"
 
-namespace sgl::detail::backend {
+namespace sgl::detail {
     static bool s_glfw_initialized = false;
     static bool s_glad_initialized = false;
 
@@ -17,6 +17,7 @@ namespace sgl::detail::backend {
         }
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
+            SGL_LOG_ERROR("ensure_glfw(): glfwInit() failed");
             return false;
         }
         s_glfw_initialized = true;
@@ -27,7 +28,12 @@ namespace sgl::detail::backend {
         if (s_glad_initialized) {
             return true;
         }
+        if (glfwGetCurrentContext() == nullptr) {
+            SGL_LOG_ERROR("ensure_glad(): no current context. Create window and make it current first.");
+            return false;
+        }
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+            SGL_LOG_ERROR("ensure_glad(): gladLoadGLLoader failed.");
             return false;
         }
         s_glad_initialized = true;

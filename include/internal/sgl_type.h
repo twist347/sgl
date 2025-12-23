@@ -14,6 +14,9 @@ namespace sgl {
     using gl_int = int; // GLint
     using gl_uint = unsigned int; // GLuint
 
+    using gl_int64 = std::int64_t; // GLint64
+    using gl_uint64 = std::uint64_t; // GLuint64
+
     using gl_sizei = int; // GLsizei
 
     using gl_enum = unsigned int; // GLenum
@@ -26,4 +29,6 @@ namespace sgl {
 
     using gl_intptr = std::intptr_t; // GLintptr
     using gl_sizeiptr = std::ptrdiff_t; // GLsizeiptr
+
+    using gl_void = void; // GLvoid
 }

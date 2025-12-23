@@ -14,6 +14,9 @@ namespace {
     static_assert(std::is_same_v<sgl::gl_int, GLint>);
     static_assert(std::is_same_v<sgl::gl_uint, GLuint>);
 
+    static_assert(std::is_same_v<sgl::gl_int64, GLint64>);
+    static_assert(std::is_same_v<sgl::gl_uint64, GLuint64>);
+
     static_assert(std::is_same_v<sgl::gl_sizei, GLsizei>);
     static_assert(std::is_same_v<sgl::gl_enum, GLenum>);
     static_assert(std::is_same_v<sgl::gl_bitfield, GLbitfield>);
@@ -28,4 +31,6 @@ namespace {
 
     static_assert(sizeof(sgl::gl_intptr) == sizeof(void *));
     static_assert(sizeof(sgl::gl_sizeiptr) == sizeof(void *));
+
+    static_assert(std::is_same_v<sgl::gl_void, GLvoid>);
 }

@@ -5,8 +5,6 @@
 
 #include "glad/glad.h"
 
-#include "internal/sgl_vertex_buffer.h"
-#include "internal/sgl_element_buffer.h"
 #include "internal/sgl_log.h"
 
 namespace sgl {
@@ -38,10 +36,12 @@ namespace sgl {
         glGenVertexArrays(1, &id);
         if (id == 0) {
             SGL_LOG_ERROR("glGenVertexArrays() returned 0");
-            return unexpected{error::gl_gen_buffers_failed};
+            return unexpected{error::gl_gen_vertex_arrays_failed};
         }
         return vertex_array{id};
     }
+
+    // try wrappers
 
     vertex_array vertex_array::create_try() noexcept {
         auto res = create();
@@ -54,7 +54,7 @@ namespace sgl {
     // api
 
     void vertex_array::bind() const noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         glBindVertexArray(m_id);
     }
@@ -74,7 +74,7 @@ namespace sgl {
     void vertex_array::attrib_pointer(
         gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
     ) const noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
     }
@@ -89,7 +89,7 @@ namespace sgl {
     void vertex_array::attrib_pointer_i(
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         glVertexAttribIPointer(idx, size, type, stride, pointer);
     }
@@ -97,6 +97,8 @@ namespace sgl {
     void vertex_array::attrib_pointer_i_and_enable(
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
+        assert(m_id);
+
         attrib_pointer_i(idx, size, type, stride, pointer);
         enable_attrib(idx);
     }
@@ -104,7 +106,7 @@ namespace sgl {
     void vertex_array::attrib_pointer_l(
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
-        assert(m_id != 0);
+        assert(m_id);
 
         glVertexAttribLPointer(idx, size, type, stride, pointer);
     }
@@ -112,15 +114,10 @@ namespace sgl {
     void vertex_array::attrib_pointer_l_and_enable(
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
+        assert(m_id);
+
         attrib_pointer_l(idx, size, type, stride, pointer);
         enable_attrib(idx);
-    }
-
-    constexpr const char *vertex_array::err_to_str(error e) noexcept {
-        switch (e) {
-            case error::gl_gen_buffers_failed: return "glGenVertexArrays() failed";
-            default: return "unknown vertex_array_error";
-        }
     }
 
     // internal

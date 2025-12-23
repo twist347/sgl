@@ -56,4 +56,24 @@ namespace sgl::render {
             glDisable(GL_BLEND);
         }
     }
+
+    void set_viewport(int x, int y, int w, int h) noexcept {
+        glViewport(x, y, w, h);
+    }
+
+    void set_polygon_mode_fill() noexcept {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    void set_polygon_mode_line() noexcept {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+
+    void set_polygon_mode_point() noexcept {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    }
+
+    void set_line_width(float width) noexcept {
+        glLineWidth(width);
+    }
 }

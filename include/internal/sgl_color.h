@@ -19,9 +19,10 @@ namespace sgl {
     };
 
     static_assert(sizeof(color) == 4);
+    static_assert(alignof(color) == 1);
 
     namespace colors {
-        inline constexpr color transparent{0, 0, 0, 255};
+        inline constexpr color transparent{0, 0, 0, 0};
         inline constexpr color black{0, 0, 0, 255};
         inline constexpr color white{255, 255, 255, 255};
         inline constexpr color red{255, 0, 0, 255};

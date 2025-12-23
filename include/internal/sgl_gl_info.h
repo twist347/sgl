@@ -25,6 +25,8 @@ namespace sgl {
 
     enum class gl_info_error {
         backend_not_initialized = 0,
+        no_current_context,
+
         count
     };
 

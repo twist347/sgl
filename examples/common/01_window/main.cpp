@@ -9,7 +9,7 @@ static constexpr int HEIGHT = 1080;
 static constexpr auto TITLE = __FILE__;
 
 int main() {
-    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE});
+    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .fullscreen = true});
 
     sgl::render::set_clear_color(sgl::colors::gray);
 

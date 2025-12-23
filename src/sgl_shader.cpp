@@ -13,7 +13,8 @@
 namespace sgl {
     // ctors and assignments
 
-    shader::shader(shader &&other) noexcept : m_program{std::exchange(other.m_program, 0)} {
+    shader::shader(shader &&other) noexcept : m_program{std::exchange(other.m_program, 0)},
+                                              m_uniform_cache{std::move(other.m_uniform_cache)} {
     }
 
     shader &shader::operator=(shader &&other) noexcept {
@@ -24,7 +25,8 @@ namespace sgl {
         destroy();
 
         m_program = std::exchange(other.m_program, 0);
-        m_uniform_cache = {};
+        m_uniform_cache = std::move(other.m_uniform_cache);
+        other.m_uniform_cache.clear();
 
         return *this;
     }
@@ -108,7 +110,7 @@ namespace sgl {
         return create_from_source(vs_src, fs_src);
     }
 
-    // or panic wrappers
+    // try wrappers
 
     shader shader::create_from_ids_try(gl_uint vertex_shader, gl_uint fragment_shader) noexcept {
         auto res = create_from_ids(vertex_shader, fragment_shader);
@@ -144,6 +146,8 @@ namespace sgl {
     // api
 
     void shader::use() const noexcept {
+        assert(m_program);
+
         glUseProgram(m_program);
     }
 
@@ -157,9 +161,7 @@ namespace sgl {
         }
 
         const gl_int loc = glGetUniformLocation(m_program, name);
-        if (loc >= 0) {
-            m_uniform_cache.emplace(name, loc);
-        }
+        m_uniform_cache.emplace(name, loc); // cache -1 too
 
         return loc;
     }
@@ -167,6 +169,8 @@ namespace sgl {
     // scalars
 
     bool shader::set_uniform(gl_int loc, gl_int v) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc)) {
             return false;
         }
@@ -175,6 +179,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform(gl_int loc, gl_uint v) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc)) {
             return false;
         }
@@ -183,6 +189,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform(gl_int loc, gl_float v) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc)) {
             return false;
         }
@@ -193,6 +201,8 @@ namespace sgl {
     // vecs
 
     bool shader::set_uniform_vec2(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc) || !v) {
             return false;
         }
@@ -201,6 +211,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform_vec3(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc) || !v) {
             return false;
         }
@@ -209,6 +221,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform_vec4(gl_int loc, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc) || !v) {
             return false;
         }
@@ -219,6 +233,8 @@ namespace sgl {
     // mats (column major)
 
     bool shader::set_uniform_mat3(gl_int loc, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc) || !m) {
             return false;
         }
@@ -227,6 +243,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform_mat4(gl_int loc, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!validate_uniform_loc(loc) || !m) {
             return false;
         }
@@ -237,6 +255,8 @@ namespace sgl {
     // scalars
 
     bool shader::set_uniform(const char *name, gl_int v) const noexcept {
+        assert(m_program);
+
         if (!name) {
             return false;
         }
@@ -251,6 +271,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform(const char *name, gl_uint v) const noexcept {
+        assert(m_program);
+
         if (!name) {
             return false;
         }
@@ -265,6 +287,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform(const char *name, gl_float v) const noexcept {
+        assert(m_program);
+
         if (!name) {
             return false;
         }
@@ -281,6 +305,8 @@ namespace sgl {
     // vecs
 
     bool shader::set_uniform_vec2(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!name || !v) {
             return false;
         }
@@ -295,6 +321,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform_vec3(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!name || !v) {
             return false;
         }
@@ -309,6 +337,8 @@ namespace sgl {
     }
 
     bool shader::set_uniform_vec4(const char *name, const gl_float *v, gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!name || !v) {
             return false;
         }
@@ -324,7 +354,10 @@ namespace sgl {
 
     // mats (column major)
 
-    bool shader::set_uniform_mat3(const char *name, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+    bool shader::set_uniform_mat3(const char *name, const gl_float *m, gl_boolean transpose,
+                                  gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!name || !m) {
             return false;
         }
@@ -338,7 +371,10 @@ namespace sgl {
         return set_uniform_mat3(loc, m, transpose, count);
     }
 
-    bool shader::set_uniform_mat4(const char *name, const gl_float *m, gl_boolean transpose, gl_sizei count) const noexcept {
+    bool shader::set_uniform_mat4(const char *name, const gl_float *m, gl_boolean transpose,
+                                  gl_sizei count) const noexcept {
+        assert(m_program);
+
         if (!name || !m) {
             return false;
         }
@@ -350,19 +386,6 @@ namespace sgl {
         }
 
         return set_uniform_mat4(loc, m, transpose, count);
-    }
-
-    constexpr const char *shader::err_to_str(error err) noexcept {
-        switch (err) {
-            case error::invalid_params: return "invalid params";
-            case error::file_io_failed: return "file I/O failed";
-            case error::gl_vertex_compile_failed: return "vertex shader compile failed";
-            case error::gl_fragment_compile_failed: return "fragment shader compile failed";
-            case error::gl_program_link_failed: return "shader program link failed";
-            case error::gl_create_shader_failed: return "glCreateShader() failed";
-            case error::gl_create_program_failed: return "glCreateProgram() failed";
-            default: return "unknown shader_error";
-        }
     }
 
     // internal
@@ -464,6 +487,8 @@ namespace sgl {
     }
 
     bool shader::validate_uniform_loc(gl_int loc) const noexcept {
+        assert(m_program);
+
         if (loc < 0) {
             SGL_LOG_ERROR("shader::set_uniform: location < 0");
             return false;
@@ -474,12 +499,11 @@ namespace sgl {
             return false;
         }
 
+#ifndef NDEBUG
         GLint current = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &current);
-        if (static_cast<gl_uint>(current) != m_program) {
-            SGL_LOG_ERROR("shader::set_uniform: this program is not currently in use");
-            return false;
-        }
+        assert(static_cast<gl_uint>(current) == m_program);
+#endif
 
         return true;
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace sgl {
-    enum class key {
+    enum class key : std::size_t {
         unknown = 0,
 
         space,
@@ -33,7 +33,7 @@ namespace sgl {
         count
     };
 
-    enum class mouse_button {
+    enum class mouse_button : std::size_t {
         unknown = 0,
 
         left,

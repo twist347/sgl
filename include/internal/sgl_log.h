@@ -38,10 +38,12 @@ namespace sgl {
         }
 
         std::fprintf(out, "\n");
-        std::fflush(out);
 
         if (level == log_level::fatal) {
-            std::exit(EXIT_FAILURE);
+            std::fflush(out);
+            std::fflush(stdout);
+            std::fflush(stderr);
+            std::abort();
         }
     }
 }
