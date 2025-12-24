@@ -2,6 +2,7 @@
 
 #include "sgl_expected.h"
 #include "sgl_type.h"
+#include "sgl_util.h"
 
 namespace sgl {
     enum class vertex_array_error {
@@ -53,6 +54,24 @@ namespace sgl {
         void attrib_pointer_and_enable(
             gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
         ) const noexcept;
+
+        template<typename Vertex, typename Member>
+        void attrib_pointer(
+            gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, Member Vertex::*member
+        ) const noexcept {
+            const std::size_t off = offset_of(member);
+            const auto ptr = reinterpret_cast<const void *>(static_cast<std::uintptr_t>(off));
+            attrib_pointer(idx, size, type, normalized, sizeof(Vertex), ptr);
+        }
+
+        template<typename Vertex, typename Member>
+        void attrib_pointer_and_enable(
+            gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, Member Vertex::*member
+        ) const noexcept {
+            const std::size_t off = offset_of(member);
+            const auto ptr = reinterpret_cast<const void *>(static_cast<std::uintptr_t>(off));
+            attrib_pointer_and_enable(idx, size, type, normalized, sizeof(Vertex), ptr);
+        }
 
         void attrib_pointer_i(
             gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer

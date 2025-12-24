@@ -37,20 +37,15 @@ int main() {
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer_and_enable(
-        0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
-    );
-
-    vao.attrib_pointer_and_enable(
-        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
-    );
+    vao.attrib_pointer_and_enable<vertex>(0, 3, GL_FLOAT, GL_FALSE, &vertex::pos);
+    vao.attrib_pointer_and_enable<vertex>(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, &vertex::color);
 
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();
 
     const auto shader = sgl::shader::create_from_files_try(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    glLineWidth(5.0f);
+    glLineWidth(5.f);
 
     sgl::render::set_clear_color(sgl::colors::gray);
 

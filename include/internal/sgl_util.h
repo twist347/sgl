@@ -21,9 +21,18 @@ namespace sgl {
         return sizeof(M);
     }
 
+    template<typename T, typename M>
+        requires (std::is_standard_layout_v<T> && std::is_default_constructible_v<T>)
+    constexpr std::size_t offset_of(M T::*member) noexcept(std::is_nothrow_default_constructible_v<T>) {
+        T obj{};
+        const auto base = reinterpret_cast<const std::byte *>(std::addressof(obj));
+        const auto mem = reinterpret_cast<const std::byte *>(std::addressof(obj.*member));
+        return static_cast<std::size_t>(mem - base);
+    }
+
     namespace detail {
         template<typename T>
-        requires std::is_standard_layout_v<T>
+            requires std::is_standard_layout_v<T>
         constexpr std::size_t checked_offset(std::size_t off) noexcept {
             return off;
         }
