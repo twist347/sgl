@@ -140,7 +140,9 @@ void render_light(const sgl::shader &shader, const sgl::vertex_array &vao, const
 void update_light_pos(const sgl::shader &shader, float dt);
 
 int main() {
-    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false});
+    const auto window = sgl::window::create_try({
+        .width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false
+    });
 
     auto cam = sgl::camera::create(
         45.f,
@@ -167,29 +169,25 @@ int main() {
 
     const auto obj_vao = sgl::vertex_array::create_try();
     const auto light_vao = sgl::vertex_array::create_try();
-    const auto vbo = sgl::vertex_buffer::create_try(
-        g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW
-    );
-    const auto ebo = sgl::element_buffer::create_try(
-        g_indices.data(), sizeof(g_indices), GL_UNSIGNED_INT, GL_STATIC_DRAW
-    );
+    const auto vbo = sgl::vertex_buffer::create_try(std::span{g_vertices}, GL_STATIC_DRAW);
+    const auto ebo = sgl::element_buffer::create_try(std::span{g_indices},GL_STATIC_DRAW);
 
     obj_vao.bind();
     vbo.bind();
 
-    obj_vao.attrib_pointer_and_enable(
-        0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+    obj_vao.attrib_pointer_and_enable<vertex>(
+        0, 3, GL_FLOAT, GL_FALSE, SGL_PTR_OFFSET_OF(vertex, pos)
     );
-    obj_vao.attrib_pointer_and_enable(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, normal)
+    obj_vao.attrib_pointer_and_enable<vertex>(
+        1, 3, GL_FLOAT, GL_FALSE, SGL_PTR_OFFSET_OF(vertex, normal)
     );
 
     ebo.bind();
 
     light_vao.bind();
     vbo.bind();
-    light_vao.attrib_pointer_and_enable(
-        0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+    light_vao.attrib_pointer_and_enable<vertex>(
+        0, 3, GL_FLOAT, GL_FALSE, SGL_PTR_OFFSET_OF(vertex, pos)
     );
     ebo.bind();
 

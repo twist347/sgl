@@ -33,4 +33,10 @@ namespace {
     static_assert(sizeof(sgl::gl_sizeiptr) == sizeof(void *));
 
     static_assert(std::is_same_v<sgl::gl_void, GLvoid>);
+
+    using under = std::underlying_type_t<sgl::idx_type>;
+
+    static_assert(static_cast<under>(sgl::idx_type::u8) == static_cast<under>(GL_UNSIGNED_BYTE));
+    static_assert(static_cast<under>(sgl::idx_type::u16) == static_cast<under>(GL_UNSIGNED_SHORT));
+    static_assert(static_cast<under>(sgl::idx_type::u32) == static_cast<under>(GL_UNSIGNED_INT));
 }

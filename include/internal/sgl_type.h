@@ -31,4 +31,10 @@ namespace sgl {
     using gl_sizeiptr = std::ptrdiff_t; // GLsizeiptr
 
     using gl_void = void; // GLvoid
+
+    enum class idx_type : gl_enum {
+        u8 = 0x1401u, // GL_UNSIGNED_BYTE
+        u16 = 0x1403u, // GL_UNSIGNED_SHORT
+        u32 = 0x1405u // GL_UNSIGNED_INT
+    };
 }

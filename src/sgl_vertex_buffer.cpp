@@ -92,11 +92,22 @@ namespace sgl {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void vertex_buffer::set_data(const void *data, gl_sizeiptr size) const noexcept {
+    void vertex_buffer::set_data(const void *data, gl_sizeiptr size) noexcept {
         assert(m_id);
-        assert(size > 0);
 
+        if (size <= 0) {
+            SGL_LOG_ERROR("vertex_buffer::set_data(): invalid size=%td", size);
+            return;
+        }
+
+#ifndef NDEBUG
+        gl_int cur = 0;
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &cur);
+        assert(static_cast<gl_uint>(cur) == m_id && "vertex_buffer::set_data(): buffer is not bound");
+#endif
         glBufferData(GL_ARRAY_BUFFER, size, data, m_usage);
+
+        m_size = size;
     }
 
     // internal
@@ -112,6 +123,7 @@ namespace sgl {
             glDeleteBuffers(1, &m_id);
             m_id = 0;
             m_size = 0;
+            m_usage = 0;
         }
     }
 }

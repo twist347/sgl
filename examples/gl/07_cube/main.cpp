@@ -117,21 +117,19 @@ int main() {
 
     const auto vao = sgl::vertex_array::create_try();
 
-    const auto vbo = sgl::vertex_buffer::create_try(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
+    const auto vbo = sgl::vertex_buffer::create_try(std::span{vertices}, GL_STATIC_DRAW);
 
-    const auto ebo = sgl::element_buffer::create_try(
-        indices.data(), sizeof(indices),GL_UNSIGNED_INT,GL_STATIC_DRAW
-    );
+    const auto ebo = sgl::element_buffer::create_try(std::span{indices}, GL_STATIC_DRAW);
 
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer_and_enable(
-        0, 3,GL_FLOAT,GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+    vao.attrib_pointer_and_enable<vertex>(
+        0, 3,GL_FLOAT,GL_FALSE, SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer_and_enable(
-        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+    vao.attrib_pointer_and_enable<vertex>(
+        1, 4,GL_UNSIGNED_BYTE,GL_TRUE, SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     ebo.bind();

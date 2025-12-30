@@ -6,6 +6,7 @@
 #include "glad/glad.h"
 
 #include "internal/sgl_log.h"
+#include "internal/sgl_util.h"
 
 namespace sgl {
     // ctors and assignments
@@ -63,11 +64,17 @@ namespace sgl {
         glBindVertexArray(0);
     }
 
-    void vertex_array::enable_attrib(gl_uint idx) noexcept {
+    void vertex_array::enable_attrib(gl_uint idx) const noexcept {
+        assert(m_id);
+        debug_assert_bound(m_id);
+
         glEnableVertexAttribArray(idx);
     }
 
-    void vertex_array::disable_attrib(gl_uint idx) noexcept {
+    void vertex_array::disable_attrib(gl_uint idx) const noexcept {
+        assert(m_id);
+        debug_assert_bound(m_id);
+
         glDisableVertexAttribArray(idx);
     }
 
@@ -75,6 +82,7 @@ namespace sgl {
         gl_uint idx, gl_int size, gl_enum type, gl_boolean normalized, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id);
+        debug_assert_bound(m_id);
 
         glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
     }
@@ -90,6 +98,7 @@ namespace sgl {
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id);
+        debug_assert_bound(m_id);
 
         glVertexAttribIPointer(idx, size, type, stride, pointer);
     }
@@ -107,6 +116,7 @@ namespace sgl {
         gl_uint idx, gl_int size, gl_enum type, gl_sizei stride, const void *pointer
     ) const noexcept {
         assert(m_id);
+        debug_assert_bound(m_id);
 
         glVertexAttribLPointer(idx, size, type, stride, pointer);
     }
@@ -127,5 +137,15 @@ namespace sgl {
             glDeleteVertexArrays(1, &m_id);
             m_id = 0;
         }
+    }
+
+    void vertex_array::debug_assert_bound(gl_uint expected) noexcept {
+#ifndef NDEBUG
+        gl_int cur = 0;
+        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cur);
+        assert(static_cast<gl_uint>(cur) == expected && "vertex_array: VAO is not bound");
+#else
+    SGL_UNUSED(expected);
+#endif
     }
 }

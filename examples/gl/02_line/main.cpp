@@ -32,13 +32,17 @@ int main() {
 
     const auto vao = sgl::vertex_array::create_try();
 
-    const auto vbo = sgl::vertex_buffer::create_try(vertices.data(), sizeof(vertices),GL_STATIC_DRAW);
+    const auto vbo = sgl::vertex_buffer::create_try(std::span{vertices},GL_STATIC_DRAW);
 
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer_and_enable<vertex>(0, 3, GL_FLOAT, GL_FALSE, &vertex::pos);
-    vao.attrib_pointer_and_enable<vertex>(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, &vertex::color);
+    vao.attrib_pointer_and_enable<vertex>(
+        0, 3, GL_FLOAT, GL_FALSE, SGL_PTR_OFFSET_OF(vertex, pos)
+    );
+    vao.attrib_pointer_and_enable<vertex>(
+        1, 4, GL_UNSIGNED_BYTE, GL_TRUE, SGL_PTR_OFFSET_OF(vertex, color)
+    );
 
     sgl::vertex_buffer::unbind();
     sgl::vertex_array::unbind();

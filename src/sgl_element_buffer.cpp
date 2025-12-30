@@ -70,7 +70,7 @@ namespace sgl {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
 
-#ifndef NDEBUB
+#ifndef NDEBUG
         const bool ok = check_created_size_bound(GL_ELEMENT_ARRAY_BUFFER, size);
 #else
         const bool ok = true;
@@ -116,6 +116,17 @@ namespace sgl {
     void element_buffer::set_data(const void *data, gl_sizeiptr size) noexcept {
         assert(m_id);
 
+        if (size <= 0) {
+            SGL_LOG_ERROR("element_buffer::set_data(): invalid size=%td", size);
+            return;
+        }
+
+#ifndef NDEBUG
+        gl_int cur = 0;
+        glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &cur);
+        assert(static_cast<gl_uint>(cur) == m_id && "element_buffer::set_data(): EBO is not bound in current VAO");
+#endif
+
         const gl_sizeiptr idx_size = index_type_size(m_type);
         if (size <= 0 || idx_size == 0 || (size % idx_size) != 0) {
             SGL_LOG_ERROR(
@@ -135,9 +146,9 @@ namespace sgl {
 
     constexpr gl_sizeiptr element_buffer::index_type_size(gl_enum type) noexcept {
         switch (type) {
-            case GL_UNSIGNED_BYTE: return sizeof(GLubyte);
-            case GL_UNSIGNED_SHORT: return sizeof(GLushort);
-            case GL_UNSIGNED_INT: return sizeof(GLuint);
+            case GL_UNSIGNED_BYTE: return sizeof(gl_ubyte);
+            case GL_UNSIGNED_SHORT: return sizeof(gl_ushort);
+            case GL_UNSIGNED_INT: return sizeof(gl_uint);
             default: return 0;
         }
     }

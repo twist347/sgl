@@ -121,7 +121,9 @@ void handle_input(sgl::camera &cam, float dt);
 void render_scene(const sgl::shader &shader, const sgl::vertex_array &vao, const sgl::camera &cam);
 
 int main() {
-    const auto window = sgl::window::create_try({.width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false});
+    const auto window = sgl::window::create_try({
+        .width = WIDTH, .height = HEIGHT, .title = TITLE, .cursor_enabled = false
+    });
 
 
     auto cam = sgl::camera::create(
@@ -134,20 +136,18 @@ int main() {
     cam.set_sens(MOVE_SENSE);
 
     const auto vao = sgl::vertex_array::create_try();
-    const auto vbo = sgl::vertex_buffer::create_try(g_vertices.data(), sizeof(g_vertices), GL_STATIC_DRAW);
-    const auto ebo = sgl::element_buffer::create_try(
-        g_indices.data(), sizeof(g_indices), GL_UNSIGNED_INT, GL_STATIC_DRAW
-    );
+    const auto vbo = sgl::vertex_buffer::create_try(std::span{g_vertices}, GL_STATIC_DRAW);
+    const auto ebo = sgl::element_buffer::create_try(std::span{g_indices}, GL_STATIC_DRAW);
 
     vao.bind();
     vbo.bind();
 
-    vao.attrib_pointer_and_enable(
-        0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, pos)
+    vao.attrib_pointer_and_enable<vertex>(
+        0, 3, GL_FLOAT, GL_FALSE, SGL_PTR_OFFSET_OF(vertex, pos)
     );
 
-    vao.attrib_pointer_and_enable(
-        1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), SGL_PTR_OFFSET_OF(vertex, color)
+    vao.attrib_pointer_and_enable<vertex>(
+        1, 4, GL_UNSIGNED_BYTE, GL_TRUE, SGL_PTR_OFFSET_OF(vertex, color)
     );
 
     ebo.bind();
@@ -157,8 +157,7 @@ int main() {
 
     const auto shader = sgl::shader::create_from_files_try(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
-    shader.use();
-    {
+    shader.use(); {
         const auto proj = cam.projection();
         SGL_VERIFY(shader.set_uniform_mat4(U_PROJECTION, glm::value_ptr(proj)));
     }

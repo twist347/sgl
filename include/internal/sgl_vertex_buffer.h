@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include <span>
+
 #include "sgl_type.h"
 #include "sgl_expected.h"
 
@@ -32,9 +35,21 @@ namespace sgl {
 
         static result create(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
 
+        template<class T, std::size_t Extent>
+            requires std::is_trivially_copyable_v<std::remove_cv_t<T> >
+        static result create(std::span<T, Extent> data, gl_enum usage) noexcept {
+            return create(data.data(), static_cast<gl_sizeiptr>(data.size_bytes()), usage);
+        }
+
         // try wrappers
 
         static vertex_buffer create_try(const void *data, gl_sizeiptr size, gl_enum usage) noexcept;
+
+        template<class T, std::size_t Extent>
+            requires std::is_trivially_copyable_v<std::remove_cv_t<T> >
+        static vertex_buffer create_try(std::span<T, Extent> data, gl_enum usage) noexcept {
+            return create_try(data.data(), static_cast<gl_sizeiptr>(data.size_bytes()), usage);
+        }
 
         // api
 
@@ -42,7 +57,13 @@ namespace sgl {
 
         static void unbind() noexcept;
 
-        void set_data(const void *data, gl_sizeiptr size) const noexcept;
+        void set_data(const void *data, gl_sizeiptr size) noexcept;
+
+        template<typename T, std::size_t Extent>
+            requires std::is_trivially_copyable_v<T>
+        void set_data(std::span<T, Extent> data) noexcept {
+            set_data(data.data(), static_cast<gl_sizeiptr>(data.size_bytes()));
+        }
 
         [[nodiscard]] gl_uint id() const noexcept { return m_id; }
         [[nodiscard]] gl_sizeiptr size() const noexcept { return m_size; }
