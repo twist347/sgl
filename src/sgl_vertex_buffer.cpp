@@ -6,6 +6,7 @@
 #include "glad/glad.h"
 
 #include "internal/sgl_log.h"
+#include "internal/sgl_util.h"
 
 namespace sgl {
     // ctors and assignments
@@ -100,11 +101,8 @@ namespace sgl {
             return;
         }
 
-#ifndef NDEBUG
-        gl_int cur = 0;
-        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &cur);
-        assert(static_cast<gl_uint>(cur) == m_id && "vertex_buffer::set_data(): buffer is not bound");
-#endif
+        debug_assert_bound(m_id);
+
         glBufferData(GL_ARRAY_BUFFER, size, data, m_usage);
 
         m_size = size;
@@ -116,6 +114,16 @@ namespace sgl {
         GLint64 actual = 0;
         glGetBufferParameteri64v(target, GL_BUFFER_SIZE, &actual);
         return actual == expected;
+    }
+
+    void vertex_buffer::debug_assert_bound(gl_uint expected) noexcept {
+#ifndef NDEBUG
+        gl_int cur = 0;
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &cur);
+        assert(static_cast<gl_uint>(cur) == expected && "vertex_buffer: vbo is not bound");
+#else
+        SGL_UNUSED(expected);
+#endif
     }
 
     void vertex_buffer::destroy() noexcept {

@@ -128,12 +128,13 @@ namespace sgl {
         }
 
     private:
+        static void debug_assert_bound(gl_uint expected) noexcept;
+
+    private:
         explicit vertex_array(gl_uint id) noexcept : m_id{id} {
         }
 
         void destroy() noexcept;
-
-        static void debug_assert_bound(gl_uint expected) noexcept;
 
         gl_uint m_id = 0;
     };

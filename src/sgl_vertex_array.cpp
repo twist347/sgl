@@ -130,6 +130,16 @@ namespace sgl {
         enable_attrib(idx);
     }
 
+    void vertex_array::debug_assert_bound(gl_uint expected) noexcept {
+#ifndef NDEBUG
+        gl_int cur = 0;
+        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cur);
+        assert(static_cast<gl_uint>(cur) == expected && "vertex_array: VAO is not bound");
+#else
+        SGL_UNUSED(expected);
+#endif
+    }
+
     // internal
 
     void vertex_array::destroy() noexcept {
@@ -137,15 +147,5 @@ namespace sgl {
             glDeleteVertexArrays(1, &m_id);
             m_id = 0;
         }
-    }
-
-    void vertex_array::debug_assert_bound(gl_uint expected) noexcept {
-#ifndef NDEBUG
-        gl_int cur = 0;
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cur);
-        assert(static_cast<gl_uint>(cur) == expected && "vertex_array: VAO is not bound");
-#else
-    SGL_UNUSED(expected);
-#endif
     }
 }

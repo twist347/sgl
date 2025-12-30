@@ -81,6 +81,8 @@ namespace sgl {
     private:
         static bool check_created_size_bound(gl_enum target, gl_sizeiptr expected) noexcept;
 
+        static void debug_assert_bound(gl_uint expected) noexcept;
+
     private:
         explicit vertex_buffer(gl_uint id, gl_sizeiptr size, gl_enum usage) noexcept
             : m_id{id}, m_size{size}, m_usage{usage} {
