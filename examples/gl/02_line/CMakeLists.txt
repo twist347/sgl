@@ -1,4 +1,4 @@
-set(T 03_line)
+set(T 02_line)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)

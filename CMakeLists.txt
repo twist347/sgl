@@ -6,7 +6,6 @@ project(${T})
 
 find_package(OpenGL REQUIRED)
 
-set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
@@ -43,17 +42,17 @@ add_library(
         src/sgl_stb_image_impl.cpp
 )
 
+target_compile_features(${T} PUBLIC cxx_std_20)
 target_compile_definitions(${T} PRIVATE GLFW_INCLUDE_NONE)
 target_include_directories(
         ${T}
         PUBLIC
-        include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${TL_DIR}
-        ${GLM_DIR}
         PRIVATE
         ${STB_IMAGE_DIR}
 )
-target_link_libraries(${T} PUBLIC glad glfw OpenGL::GL)
+target_link_libraries(${T} PUBLIC glad glfw glm::glm OpenGL::GL)
 target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_subdirectory(${EXAMPLES_DIR})

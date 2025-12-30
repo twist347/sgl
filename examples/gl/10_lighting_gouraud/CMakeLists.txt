@@ -1,4 +1,4 @@
-set(T 11_lightning_gouraud)
+set(T 10_lightning_gouraud)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl glm)

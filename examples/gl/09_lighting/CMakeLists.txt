@@ -1,4 +1,4 @@
-set(T 10_lightning)
+set(T 09_lightning)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl glm)

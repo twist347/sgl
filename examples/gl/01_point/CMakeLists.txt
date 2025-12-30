@@ -1,4 +1,4 @@
-set(T 02_point)
+set(T 01_point)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl)

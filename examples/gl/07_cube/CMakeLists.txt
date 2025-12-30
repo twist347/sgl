@@ -1,4 +1,4 @@
-set(T 08_cube)
+set(T 07_cube)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl glm)

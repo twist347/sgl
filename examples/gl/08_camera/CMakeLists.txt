@@ -1,4 +1,4 @@
-set(T 09_camera)
+set(T 08_camera)
 
 add_executable(${T} main.cpp)
 target_link_libraries(${T} sgl glm)
