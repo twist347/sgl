@@ -1,7 +1,7 @@
 set(T 03_triangle)
 
 add_executable(${T} main.cpp)
-target_link_libraries(${T} sgl)
+target_link_libraries(${T} sgl glad)
 target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_custom_target(copy_shaders_${T} ALL

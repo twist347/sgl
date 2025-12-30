@@ -16,10 +16,12 @@ set(GLAD_DIR ${EXTERNAL_DIR}/glad)
 set(STB_IMAGE_DIR ${EXTERNAL_DIR}/stb_image)
 set(TL_DIR ${EXTERNAL_DIR}/tl)
 set(GLM_DIR ${EXTERNAL_DIR}/glm-1.0.2)
+set(FMT_DIR ${EXTERNAL_DIR}/fmt-12.1.0)
 
 add_subdirectory(${GLFW_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(${GLAD_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(${GLM_DIR} EXCLUDE_FROM_ALL)
+add_subdirectory(${FMT_DIR} EXCLUDE_FROM_ALL)
 
 add_library(
         ${T} STATIC
@@ -52,7 +54,7 @@ target_include_directories(
         PRIVATE
         ${STB_IMAGE_DIR}
 )
-target_link_libraries(${T} PUBLIC glad glfw glm::glm OpenGL::GL)
+target_link_libraries(${T} PUBLIC glm::glm PRIVATE glad glfw fmt::fmt OpenGL::GL)
 target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_subdirectory(${EXAMPLES_DIR})
