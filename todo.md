@@ -9,3 +9,4 @@
 - [ ] add shader link message 
 - [x] add texture load message
 - [ ] add on/off log mechanism for shaders/textures
+- [ ] replace const char * and std::string with string_view in api

@@ -26,7 +26,6 @@ namespace sgl {
 
         m_program = std::exchange(other.m_program, 0);
         m_uniform_cache = std::move(other.m_uniform_cache);
-        other.m_uniform_cache.clear();
 
         return *this;
     }
