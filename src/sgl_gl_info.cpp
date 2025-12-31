@@ -15,19 +15,19 @@ namespace sgl {
 
         // GLFW init first
         if (!detail::ensure_glfw()) {
-            SGL_LOG_ERROR("get_gl_info(): glfw init failed");
+            log_error("get_gl_info(): glfw init failed");
             return unexpected{gl_info_error::backend_not_initialized};
         }
 
         // Must have a current context before glad/gl calls
         if (!glfwGetCurrentContext()) {
-            SGL_LOG_ERROR("get_gl_info(): no current OpenGL context");
+            log_error("get_gl_info(): no current OpenGL context");
             return unexpected{gl_info_error::no_current_context};
         }
 
         // Load GL entry points (requires context on most platforms)
         if (!detail::ensure_glad()) {
-            SGL_LOG_ERROR("get_gl_info(): glad init failed");
+            log_error("get_gl_info(): glad init failed");
             return unexpected{gl_info_error::backend_not_initialized};
         }
 
@@ -75,7 +75,7 @@ namespace sgl {
         }
 
         if (!detail::ensure_glfw() || !detail::ensure_glad()) {
-            SGL_LOG_ERROR("has_extension(): backend not initialized");
+            log_error("has_extension(): backend not initialized");
             return false;
         }
 

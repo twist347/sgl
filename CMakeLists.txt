@@ -54,7 +54,7 @@ target_include_directories(
         PRIVATE
         ${STB_IMAGE_DIR}
 )
-target_link_libraries(${T} PUBLIC glm::glm PRIVATE glad glfw fmt::fmt OpenGL::GL)
+target_link_libraries(${T} PUBLIC fmt::fmt glm::glm PRIVATE glad glfw OpenGL::GL)
 target_compile_options(${T} PRIVATE -Wall -Wextra -Wpedantic)
 
 add_subdirectory(${EXAMPLES_DIR})

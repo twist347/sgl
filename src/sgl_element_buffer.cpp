@@ -50,8 +50,8 @@ namespace sgl {
     ) noexcept {
         const gl_sizeiptr idx_size = index_type_size(index_type);
         if (size <= 0 || idx_size == 0 || (size % idx_size) != 0) {
-            SGL_LOG_ERROR(
-                "element_buffer::create(): invalid params (size=%td, type=0x%x)",
+            log_error(
+                "element_buffer::create(): invalid params (size={}, type=0x{})",
                 size, static_cast<unsigned int>(index_type)
             );
             return unexpected{error::invalid_params};
@@ -60,7 +60,7 @@ namespace sgl {
         gl_uint id = 0;
         glGenBuffers(1, &id);
         if (id == 0) {
-            SGL_LOG_ERROR("glGenBuffers() returned 0");
+            log_error("glGenBuffers() returned 0");
             return unexpected{error::gl_gen_buffers_failed};
         }
 
@@ -79,7 +79,7 @@ namespace sgl {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prev_ebo);
 
         if (!ok) {
-            SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
+            log_error("glBufferData() failed to allocate {} bytes", size);
             glDeleteBuffers(1, &id);
             return unexpected{error::gl_alloc_failed};
         }
@@ -96,7 +96,7 @@ namespace sgl {
     ) noexcept {
         auto res = create(data, size, index_type, usage);
         if (!res) {
-            SGL_LOG_FATAL("failed to create element_buffer: %s", err_to_str(res.error()));
+            log_fatal("failed to create element_buffer: {}", err_to_str(res.error()));
         }
         return std::move(*res);
     }
@@ -117,7 +117,7 @@ namespace sgl {
         assert(m_id);
 
         if (size <= 0) {
-            SGL_LOG_ERROR("element_buffer::set_data(): invalid size=%td", size);
+            log_error("element_buffer::set_data(): invalid size={}", size);
             return;
         }
 
@@ -129,8 +129,8 @@ namespace sgl {
 
         const gl_sizeiptr idx_size = index_type_size(m_type);
         if (size <= 0 || idx_size == 0 || (size % idx_size) != 0) {
-            SGL_LOG_ERROR(
-                "element_buffer::set_data(): invalid size=%td for current type=0x%x",
+            log_error(
+                "element_buffer::set_data(): invalid size={} for current type=0x{}",
                 size, static_cast<unsigned int>(m_type)
             );
             return;

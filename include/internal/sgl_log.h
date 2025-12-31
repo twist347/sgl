@@ -1,13 +1,11 @@
 #pragma once
 
+#include <cstdio>
 #include <cstdlib>
 #include <utility>
-#include <cstdio>
+#include <cassert>
 
-#define SGL_LOG_INFO(fmt, ...)  ::sgl::log(::sgl::log_level::info,   (fmt) __VA_OPT__(,) __VA_ARGS__)
-#define SGL_LOG_WARN(fmt, ...)  ::sgl::log(::sgl::log_level::warn,(fmt) __VA_OPT__(,) __VA_ARGS__)
-#define SGL_LOG_ERROR(fmt, ...) ::sgl::log(::sgl::log_level::error,  (fmt) __VA_OPT__(,) __VA_ARGS__)
-#define SGL_LOG_FATAL(fmt, ...) ::sgl::log(::sgl::log_level::fatal,  (fmt) __VA_OPT__(,) __VA_ARGS__)
+#include "fmt/base.h"
 
 namespace sgl {
     enum class log_level {
@@ -26,24 +24,38 @@ namespace sgl {
     }
 
     template<typename... Args>
-    void log(log_level level, const char *fmt, Args &&... args) noexcept {
+    void log(log_level level, fmt::format_string<Args...> fmt, Args &&... args) noexcept {
+        assert(level < log_level::count);
+
         FILE *out = detail::stream_for(level);
-
-        std::fprintf(out, "[%s]: ", detail::level_name(level));
-
-        if constexpr (sizeof...(Args) == 0) {
-            std::fputs(fmt, out);
-        } else {
-            std::fprintf(out, fmt, std::forward<Args>(args)...);
+        try {
+            fmt::print(out, "[{}]: ", detail::level_name(level));
+            fmt::println(out, fmt, std::forward<Args>(args)...);
+        } catch (...) {
+            std::fputs("[LOG]: formatting failed", stderr);
         }
-
-        std::fprintf(out, "\n");
-
         if (level == log_level::fatal) {
-            std::fflush(out);
-            std::fflush(stdout);
-            std::fflush(stderr);
             std::abort();
         }
+    }
+
+    template<typename... Args>
+    void log_info(fmt::format_string<Args...> fmt, Args &&... args) noexcept {
+        log(log_level::info, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void log_warn(fmt::format_string<Args...> fmt, Args &&... args) noexcept {
+        log(log_level::warn, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void log_error(fmt::format_string<Args...> fmt, Args &&... args) noexcept {
+        log(log_level::error, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void log_fatal(fmt::format_string<Args...> fmt, Args &&... args) noexcept {
+        log(log_level::fatal, fmt, std::forward<Args>(args)...);
     }
 }

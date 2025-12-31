@@ -17,7 +17,7 @@ namespace sgl::detail {
         }
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
-            SGL_LOG_ERROR("ensure_glfw(): glfwInit() failed");
+            log_error("ensure_glfw(): glfwInit() failed");
             return false;
         }
         s_glfw_initialized = true;
@@ -29,11 +29,11 @@ namespace sgl::detail {
             return true;
         }
         if (glfwGetCurrentContext() == nullptr) {
-            SGL_LOG_ERROR("ensure_glad(): no current context. Create window and make it current first.");
+            log_error("ensure_glad(): no current context. Create window and make it current first.");
             return false;
         }
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
-            SGL_LOG_ERROR("ensure_glad(): gladLoadGLLoader failed.");
+            log_error("ensure_glad(): gladLoadGLLoader failed.");
             return false;
         }
         s_glad_initialized = true;
@@ -54,6 +54,6 @@ namespace sgl::detail {
     }
 
     static void glfw_error_callback(int code, const char* desc) {
-        SGL_LOG_ERROR("GLFW error %d: %s", code, desc ? desc : "?");
+        log_error("GLFW error {}: {}", code, desc ? desc : "?");
     }
 }

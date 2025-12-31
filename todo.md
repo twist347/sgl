@@ -1,6 +1,11 @@
 # sgl TODO
 
-- [ ] logging: switch to fmt
+- [x] logging: switch to fmt
 - [ ] add gl namespace-layer for opengl stuff
 - [ ] add dsa features
 - [ ] add mock tests
+- [x] add shader load message 
+- [ ] add shader compile message 
+- [ ] add shader link message 
+- [x] add texture load message
+- [ ] add on/off log mechanism for shaders/textures

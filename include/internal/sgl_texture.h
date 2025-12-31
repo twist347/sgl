@@ -86,6 +86,12 @@ namespace sgl {
             return create_from_file_try(path.c_str());
         }
 
+        static texture_2d create_from_file_try(const char *path, const texture_2d_params &params) noexcept;
+
+        static texture_2d create_from_file_try(const std::string &path, const texture_2d_params &params) noexcept {
+            return create_from_file_try(path.c_str(), params);
+        }
+
         // api
 
         void bind(gl_uint unit) const noexcept;

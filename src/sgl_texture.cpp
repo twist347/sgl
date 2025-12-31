@@ -81,7 +81,7 @@ namespace sgl {
 
     texture_2d::result texture_2d::create_from_file(const char *path, const texture_2d_params &params) noexcept {
         if (!path) {
-            SGL_LOG_ERROR("texture_2d::create_from_file: path is null");
+            log_error("texture_2d::create_from_file: path is null");
             return unexpected(error::invalid_params);
         }
 
@@ -91,14 +91,14 @@ namespace sgl {
 
         stbi_uc *data = stbi_load(path, &width, &height, &nr_channels, 0);
         if (!data) {
-            SGL_LOG_ERROR("texture_2d::create_from_file: failed to load image: %s", path);
+            log_error("texture_2d::create_from_file: failed to load image: {}", path);
             return unexpected(error::stbi_load_failed);
         }
 
         gl_uint id = 0;
         glGenTextures(1, &id);
         if (id == 0) {
-            SGL_LOG_ERROR("texture_2d::create_from_file: glGenTextures() returned 0");
+            log_error("texture_2d::create_from_file: glGenTextures() returned 0");
             stbi_image_free(data);
             return unexpected(error::gl_gen_failed);
         }
@@ -139,7 +139,7 @@ namespace sgl {
                 internal_format = params.srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
                 break;
             default:
-                SGL_LOG_ERROR("texture_2d::create_from_file: unsupported channel count %d", nr_channels);
+                log_error("texture_2d::create_from_file: unsupported channel count {}", nr_channels);
                 glPixelStorei(GL_UNPACK_ALIGNMENT, prev_alignment);
                 glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(prev_tex));
                 glDeleteTextures(1, &id);
@@ -159,6 +159,9 @@ namespace sgl {
 
         stbi_image_free(data);
 
+        // TODO: expand info
+        log_info("texture_2d: loaded '{}' ({}x{})", path, width, height);
+
         return texture_2d{id, width, height, static_cast<gl_enum>(internal_format), format};
     }
 
@@ -167,7 +170,15 @@ namespace sgl {
     texture_2d texture_2d::create_from_file_try(const char *path) noexcept {
         auto res = create_from_file(path);
         if (!res) {
-            SGL_LOG_FATAL("failed to create texture_2d from '%s': %s", path, err_to_str(res.error()));
+            log_fatal("failed to create texture_2d from '{}': {}", path, err_to_str(res.error()));
+        }
+        return std::move(*res);
+    }
+
+    texture_2d texture_2d::create_from_file_try(const char *path, const texture_2d_params &params) noexcept {
+        auto res = create_from_file(path, params);
+        if (!res) {
+            log_fatal("failed to create texture_2d from '{}': {}", path, err_to_str(res.error()));
         }
         return std::move(*res);
     }

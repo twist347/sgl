@@ -37,7 +37,7 @@ namespace sgl {
     template<typename T, typename E>
     T unwrap(expected<T, E> e, const char *msg = "") noexcept {
         if (!e) {
-            SGL_LOG_FATAL("%s", msg);
+            log_fatal("{}", msg);
             return {};
         }
         return std::move(*e);

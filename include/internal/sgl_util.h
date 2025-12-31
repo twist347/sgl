@@ -13,7 +13,8 @@ namespace sgl {
     }
 
     template<typename... Args>
-    constexpr void unused(Args &&...) noexcept {
+    constexpr void unused(Args &&... args) noexcept {
+        ((void) args, ...);
     }
 
     template<typename T, typename M>
@@ -30,15 +31,11 @@ namespace sgl {
     }
 }
 
-#define SGL_UNUSED(val)    ((void) (val))
-
-#define SGL_ARR_LEN(arr)    (sizeof((arr)) / sizeof((arr)[0]))
-
 #define SGL_VERIFY_MSG(cond, msg)                                              \
     do {                                                                       \
         if (!(cond)) {                                                         \
-            SGL_LOG_FATAL(                                                     \
-                "verify failed: %s. file: %s, line: %d. %s",                   \
+            sgl::log_fatal(                                                    \
+                "verify failed: {}. file: {}, line: {}. {}",                   \
                 #cond, __FILE__, __LINE__, (msg)                               \
             );                                                                 \
         }                                                                      \

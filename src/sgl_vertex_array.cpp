@@ -36,7 +36,7 @@ namespace sgl {
         gl_uint id = 0;
         glGenVertexArrays(1, &id);
         if (id == 0) {
-            SGL_LOG_ERROR("glGenVertexArrays() returned 0");
+            log_error("glGenVertexArrays() returned 0");
             return unexpected{error::gl_gen_vertex_arrays_failed};
         }
         return vertex_array{id};
@@ -47,7 +47,7 @@ namespace sgl {
     vertex_array vertex_array::create_try() noexcept {
         auto res = create();
         if (!res) {
-            SGL_LOG_FATAL("failed to create vertex_array: %s", err_to_str(res.error()));
+            log_fatal("failed to create vertex_array: {}", err_to_str(res.error()));
         }
         return std::move(*res);
     }

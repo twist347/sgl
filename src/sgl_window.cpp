@@ -78,7 +78,7 @@ namespace sgl {
     window window::create_try(const window_params &params) noexcept {
         auto res = create(params);
         if (!res) {
-            SGL_LOG_FATAL("failed to create window: %s", err_to_str(res.error()));
+            log_fatal("failed to create window: {}", err_to_str(res.error()));
         }
         return std::move(*res);
     }
@@ -198,14 +198,13 @@ namespace sgl {
     }
 
     void window::framebuffer_size_callback(GLFWwindow *handle, int width, int height) noexcept {
-        SGL_UNUSED(handle);
+        unused(handle);
 
         glViewport(0, 0, width, height);
     }
 
     void window::key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods) noexcept {
-        SGL_UNUSED(scancode);
-        SGL_UNUSED(mods);
+        unused(scancode, mods);
 
         detail::input::on_key(key, action);
 
@@ -215,20 +214,19 @@ namespace sgl {
     }
 
     void window::mouse_button_callback(GLFWwindow *handle, int button, int action, int mods) noexcept {
-        SGL_UNUSED(handle);
-        SGL_UNUSED(mods);
+        unused(handle, mods);
 
         detail::input::on_mouse_button(button, action);
     }
 
     void window::cursor_pos_callback(GLFWwindow *handle, double x_pos, double y_pos) noexcept {
-        SGL_UNUSED(handle);
+        unused(handle);
 
         detail::input::on_cursor_pos(x_pos, y_pos);
     }
 
     void window::scroll_callback(GLFWwindow *handle, double x_offset, double y_offset) noexcept {
-        SGL_UNUSED(handle);
+        unused(handle);
 
         detail::input::on_scroll(x_offset, y_offset);
     }

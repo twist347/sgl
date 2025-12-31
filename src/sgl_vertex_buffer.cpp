@@ -44,7 +44,7 @@ namespace sgl {
         gl_uint id = 0;
         glGenBuffers(1, &id);
         if (id == 0) {
-            SGL_LOG_ERROR("glGenBuffers() returned 0");
+            log_error("glGenBuffers() returned 0");
             return unexpected{error::gl_gen_buffers_failed};
         }
 
@@ -63,7 +63,7 @@ namespace sgl {
         glBindBuffer(GL_ARRAY_BUFFER, prev);
 
         if (!ok) {
-            SGL_LOG_ERROR("glBufferData() failed to allocate %td bytes", size);
+            log_error("glBufferData() failed to allocate {} bytes", size);
             glDeleteBuffers(1, &id);
             return unexpected{error::gl_alloc_failed};
         }
@@ -76,7 +76,7 @@ namespace sgl {
     vertex_buffer vertex_buffer::create_try(const void *data, gl_sizeiptr size, gl_enum usage) noexcept {
         auto res = create(data, size, usage);
         if (!res) {
-            SGL_LOG_FATAL("failed to create vertex_buffer: %s", err_to_str(res.error()));
+            log_fatal("failed to create vertex_buffer: {}", err_to_str(res.error()));
         }
         return std::move(*res);
     }
@@ -97,7 +97,7 @@ namespace sgl {
         assert(m_id);
 
         if (size <= 0) {
-            SGL_LOG_ERROR("vertex_buffer::set_data(): invalid size=%td", size);
+            log_error("vertex_buffer::set_data(): invalid size={}", size);
             return;
         }
 
@@ -122,7 +122,7 @@ namespace sgl {
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &cur);
         assert(static_cast<gl_uint>(cur) == expected && "vertex_buffer: vbo is not bound");
 #else
-        SGL_UNUSED(expected);
+        unused(expected);
 #endif
     }
 

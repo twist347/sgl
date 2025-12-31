@@ -31,13 +31,13 @@ namespace sgl::detail {
             profile_str = "Compatibility";
         }
 
-        SGL_LOG_INFO("Version:    %d.%d (%s)",
+        log_info("Version:    {}.{} ({})",
                      version.major, version.minor,
                      version_str.empty() ? "?" : version_str.c_str());
-        SGL_LOG_INFO("GLSL:       %s", shading_language_str.empty() ? "?" : shading_language_str.c_str());
-        SGL_LOG_INFO("Vendor:     %s", vendor.empty() ? "?" : vendor.c_str());
-        SGL_LOG_INFO("Renderer:   %s", renderer.empty() ? "?" : renderer.c_str());
-        SGL_LOG_INFO("Profile:    %s", profile_str);
-        SGL_LOG_INFO("Extensions: %d", static_cast<int>(num_extensions));
+        log_info("GLSL:       {}", shading_language_str.empty() ? "?" : shading_language_str.c_str());
+        log_info("Vendor:     {}", vendor.empty() ? "?" : vendor.c_str());
+        log_info("Renderer:   {}", renderer.empty() ? "?" : renderer.c_str());
+        log_info("Profile:    {}", profile_str);
+        log_info("Extensions: {}", static_cast<int>(num_extensions));
     }
 }

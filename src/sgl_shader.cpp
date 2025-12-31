@@ -44,7 +44,7 @@ namespace sgl {
 
         const gl_uint program = glCreateProgram();
         if (!program) {
-            SGL_LOG_ERROR("glCreateProgram() failed");
+            log_error("glCreateProgram() failed");
             return unexpected{error::gl_create_program_failed};
         }
 
@@ -98,14 +98,19 @@ namespace sgl {
         std::string fs_src;
 
         if (!detail::read_text_file(vertex_path, vs_src)) {
-            SGL_LOG_ERROR("failed to read vertex shader file: %s", vertex_path);
+            log_error("failed to read vertex shader file: {}", vertex_path);
             return unexpected{error::file_io_failed};
         }
 
         if (!detail::read_text_file(fragment_path, fs_src)) {
-            SGL_LOG_ERROR("failed to read fragment shader file: %s", fragment_path);
+            log_error("failed to read fragment shader file: {}", fragment_path);
             return unexpected{error::file_io_failed};
         }
+
+        log_info(
+            "shader: loaded files vs='{}' ({} bytes), fs='{}' ({} bytes)",
+            vertex_path, vs_src.size(), fragment_path, fs_src.size()
+        );
 
         return create_from_source(vs_src, fs_src);
     }
@@ -116,7 +121,7 @@ namespace sgl {
         auto res = create_from_ids(vertex_shader, fragment_shader);
         if (!res) {
             const auto err = res.error();
-            SGL_LOG_FATAL("failed to create shader program from shaders: %s", shader::err_to_str(err));
+            log_fatal("failed to create shader program from shaders: {}", shader::err_to_str(err));
         }
         return std::move(*res);
     }
@@ -125,7 +130,7 @@ namespace sgl {
         auto res = create_from_source(vertex_src, fragment_src);
         if (!res) {
             const auto err = res.error();
-            SGL_LOG_FATAL("failed to create shader from source: %s", shader::err_to_str(err));
+            log_fatal("failed to create shader from source: {}", err_to_str(err));
         }
         return std::move(*res);
     }
@@ -134,10 +139,9 @@ namespace sgl {
         auto res = create_from_files(vertex_path, fragment_path);
         if (!res) {
             const auto err = res.error();
-            SGL_LOG_FATAL(
-                "failed to create shader from files ('%s', '%s'): %s",
-                vertex_path, fragment_path,
-                shader::err_to_str(err)
+            log_fatal(
+                "failed to create shader from files ('{}', '{}'): {}",
+                vertex_path, fragment_path, err_to_str(err)
             );
         }
         return std::move(*res);
@@ -263,7 +267,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -279,7 +283,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -295,7 +299,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -313,7 +317,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -329,7 +333,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -345,7 +349,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -364,7 +368,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -381,7 +385,7 @@ namespace sgl {
 
         const gl_int loc = uniform_loc(name);
         if (loc < 0) {
-            SGL_LOG_ERROR("uniform '%s' not found", name);
+            log_error("uniform '{}' not found", name);
             return false;
         }
 
@@ -395,7 +399,7 @@ namespace sgl {
 
         const gl_uint shader = glCreateShader(type);
         if (!shader) {
-            SGL_LOG_ERROR("glCreateShader() failed");
+            log_error("glCreateShader() failed");
             out_err = error::gl_create_shader_failed;
             return 0;
         }
@@ -451,7 +455,7 @@ namespace sgl {
         gl_sizei written = 0;
         glGetShaderInfoLog(shader_id, log_len, &written, log.data());
 
-        SGL_LOG_ERROR("'%s' compilation failed:\n%s", type_name, log.c_str());
+        log_error("'{}' compilation failed:\n{}", type_name, log);
         return false;
     }
 
@@ -475,7 +479,7 @@ namespace sgl {
         gl_sizei written = 0;
         glGetProgramInfoLog(program, log_len, &written, log.data());
 
-        SGL_LOG_ERROR("shader program linking failed:\n%s", log.c_str());
+        log_error("shader program linking failed:\n{}", log);
         return false;
     }
 
@@ -490,12 +494,12 @@ namespace sgl {
         assert(m_program);
 
         if (loc < 0) {
-            SGL_LOG_ERROR("shader::set_uniform: location < 0");
+            log_warn("shader::set_uniform: location < 0");
             return false;
         }
 
         if (!is_valid()) {
-            SGL_LOG_ERROR("shader::set_uniform: called on invalid program");
+            log_error("shader::set_uniform: called on invalid program");
             return false;
         }
 
